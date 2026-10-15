@@ -1,0 +1,13 @@
+# Byte-compiled / binary files
+bin/
+*.class
+
+# User dynamic data (sample data will initialize automatically)
+data/*.json
+!data/.gitkeep
+
+# Build and IDE files
+sources.txt
+.idea/
+.vscode/
+*.iml
