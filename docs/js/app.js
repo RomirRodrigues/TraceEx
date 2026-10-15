@@ -200,7 +200,11 @@ const App = {
 
   async refreshData() {
     try {
-      const summary = await API.getSummary(this.state.currentMonth);
+      let summary = await API.getSummary(this.state.currentMonth);
+      if (summary && summary.monthlyIncome === 0 && summary.monthlyExpense === 0 && !API.isBackendAvailable) {
+        await API.resetToSample();
+        summary = await API.getSummary(this.state.currentMonth);
+      }
       this.state.summary = summary;
 
       if (summary.settings && summary.settings.currency) {

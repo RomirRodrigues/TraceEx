@@ -256,7 +256,12 @@ const LocalDatabase = {
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed && Array.isArray(parsed.transactions) && parsed.transactions.length > 0) {
-          return parsed;
+          const now = new Date();
+          const curMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+          const hasCurrentMonth = parsed.transactions.some(t => t.date && t.date.startsWith(curMonth));
+          if (hasCurrentMonth) {
+            return parsed;
+          }
         }
       }
     } catch (e) {}
