@@ -248,12 +248,17 @@ const API = {
  * In-browser resilient database for static deployments (GitHub Pages).
  */
 const LocalDatabase = {
-  KEY: 'traceex_database_v2',
+  KEY: 'traceex_database_v3',
 
   getData() {
     try {
       const raw = localStorage.getItem(this.KEY);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.transactions) && parsed.transactions.length > 0) {
+          return parsed;
+        }
+      }
     } catch (e) {}
     const initial = this.generateInitialData();
     this.saveData(initial);
@@ -266,57 +271,86 @@ const LocalDatabase = {
 
   generateInitialData() {
     const now = new Date();
-    const dStr = (offsetDays = 0, offsetMonths = 0) => {
-      const d = new Date(now.getFullYear(), now.getMonth() - offsetMonths, now.getDate() - offsetDays);
-      return d.toISOString().slice(0, 10);
+    const curYear = now.getFullYear();
+    const curMonth = now.getMonth(); // 0 to 11
+
+    // Robust local calendar date generator (guaranteed YYYY-MM-DD in local time)
+    const dateOn = (monthOffset, day) => {
+      const d = new Date(curYear, curMonth - monthOffset, day);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${dd}`;
     };
 
     return {
       settings: {
-        currency: '$',
-        currencyCode: 'USD',
+        currency: '₹',
+        currencyCode: 'INR',
         userName: 'Alex Rivera',
         theme: 'dark'
       },
       transactions: [
-        { id: 'tx-1', title: 'Tech Corp Salary', amount: 5200.00, type: 'INCOME', category: 'Salary', date: dStr(14, 0), paymentMethod: 'Bank Transfer', notes: 'Monthly salary payout', isRecurring: true },
-        { id: 'tx-2', title: 'UI/UX Freelance Project', amount: 1450.00, type: 'INCOME', category: 'Freelance', date: dStr(4, 0), paymentMethod: 'Bank Transfer', notes: 'Client dashboard redesign', isRecurring: false },
-        { id: 'tx-3', title: 'Index Fund Dividend', amount: 280.00, type: 'INCOME', category: 'Investment', date: dStr(10, 0), paymentMethod: 'Bank Transfer', notes: 'Quarterly dividends', isRecurring: false },
-        { id: 'tx-4', title: 'Apartment Rent', amount: 1400.00, type: 'EXPENSE', category: 'Housing & Rent', date: dStr(13, 0), paymentMethod: 'Bank Transfer', notes: 'Monthly rent auto-transfer', isRecurring: true },
-        { id: 'tx-5', title: 'Whole Foods Grocery Run', amount: 164.50, type: 'EXPENSE', category: 'Food & Dining', date: dStr(1, 0), paymentMethod: 'Credit Card', notes: 'Weekly organic groceries', isRecurring: false },
-        { id: 'tx-6', title: 'Blue Bottle Artisan Coffee', amount: 14.80, type: 'EXPENSE', category: 'Food & Dining', date: dStr(2, 0), paymentMethod: 'UPI', notes: 'Morning roast with colleague', isRecurring: false },
-        { id: 'tx-7', title: 'Uber Ride to Downtown', amount: 28.50, type: 'EXPENSE', category: 'Transportation', date: dStr(3, 0), paymentMethod: 'Credit Card', notes: 'Client office transit', isRecurring: false },
-        { id: 'tx-8', title: 'High-Speed Fiber Internet', amount: 79.99, type: 'EXPENSE', category: 'Utilities', date: dStr(5, 0), paymentMethod: 'Debit Card', notes: 'Gigabit fiber optic', isRecurring: true },
-        { id: 'tx-9', title: 'Electricity & Power Bill', amount: 112.40, type: 'EXPENSE', category: 'Utilities', date: dStr(7, 0), paymentMethod: 'Debit Card', notes: 'Power utility bill', isRecurring: false },
-        { id: 'tx-10', title: 'Weekend Gourmet Dinner', amount: 96.20, type: 'EXPENSE', category: 'Food & Dining', date: dStr(6, 0), paymentMethod: 'Credit Card', notes: 'Weekend bistro dinner', isRecurring: false },
-        { id: 'tx-11', title: 'Mechanical Keyboard Keycaps', amount: 65.00, type: 'EXPENSE', category: 'Shopping', date: dStr(8, 0), paymentMethod: 'Credit Card', notes: 'Custom PBT keycaps', isRecurring: false },
-        { id: 'tx-12', title: 'Netflix & Spotify Subscriptions', amount: 27.98, type: 'EXPENSE', category: 'Entertainment', date: dStr(9, 0), paymentMethod: 'Credit Card', notes: 'Entertainment services', isRecurring: true },
-        { id: 'tx-13', title: 'Subway Transit Card Top-up', amount: 45.00, type: 'EXPENSE', category: 'Transportation', date: dStr(11, 0), paymentMethod: 'UPI', notes: 'Metro reload', isRecurring: false },
-        { id: 'tx-14', title: 'Annual Health Checkup & Vitamins', amount: 140.00, type: 'EXPENSE', category: 'Healthcare', date: dStr(12, 0), paymentMethod: 'Credit Card', notes: 'Preventative diagnostics', isRecurring: false },
-        // Month -1
-        { id: 'tx-15', title: 'Previous Month Salary', amount: 5200.00, type: 'INCOME', category: 'Salary', date: dStr(14, 1), paymentMethod: 'Bank Transfer', notes: 'Direct deposit', isRecurring: true },
-        { id: 'tx-16', title: 'Apartment Rent', amount: 1400.00, type: 'EXPENSE', category: 'Housing & Rent', date: dStr(13, 1), paymentMethod: 'Bank Transfer', notes: 'Rent', isRecurring: true },
-        { id: 'tx-17', title: 'Groceries Restock', amount: 480.00, type: 'EXPENSE', category: 'Food & Dining', date: dStr(10, 1), paymentMethod: 'Credit Card', notes: 'Pantry supplies', isRecurring: false },
-        { id: 'tx-18', title: 'Concert Tickets', amount: 185.00, type: 'EXPENSE', category: 'Entertainment', date: dStr(5, 1), paymentMethod: 'Credit Card', notes: 'Live concert', isRecurring: false },
-        // Month -2
-        { id: 'tx-19', title: 'Earlier Month Salary', amount: 5200.00, type: 'INCOME', category: 'Salary', date: dStr(14, 2), paymentMethod: 'Bank Transfer', notes: 'Salary', isRecurring: true },
-        { id: 'tx-20', title: 'Apartment Rent', amount: 1400.00, type: 'EXPENSE', category: 'Housing & Rent', date: dStr(13, 2), paymentMethod: 'Bank Transfer', notes: 'Rent', isRecurring: true },
-        { id: 'tx-21', title: 'Flight Tickets', amount: 420.00, type: 'EXPENSE', category: 'Transportation', date: dStr(15, 2), paymentMethod: 'Credit Card', notes: 'Conference flight', isRecurring: false }
+        // ================= CURRENT MONTH =================
+        { id: 'tx-1', title: 'Tech Corp Senior Engineer Salary', amount: 85000.00, type: 'INCOME', category: 'Salary', date: dateOn(0, 1), paymentMethod: 'Bank Transfer', notes: 'Monthly payroll direct credit', isRecurring: true },
+        { id: 'tx-2', title: 'Fullstack Freelance Milestone', amount: 24500.00, type: 'INCOME', category: 'Freelance', date: dateOn(0, 8), paymentMethod: 'Bank Transfer', notes: 'API architecture consulting', isRecurring: false },
+        { id: 'tx-3', title: 'Nifty Index Fund Dividends', amount: 4800.00, type: 'INCOME', category: 'Investment', date: dateOn(0, 12), paymentMethod: 'Bank Transfer', notes: 'Quarterly ETF payout', isRecurring: false },
+        { id: 'tx-4', title: 'Luxury Apartment Rent & Maintenance', amount: 26000.00, type: 'EXPENSE', category: 'Housing & Rent', date: dateOn(0, 2), paymentMethod: 'Bank Transfer', notes: 'Monthly flat lease', isRecurring: true },
+        { id: 'tx-5', title: 'Nature Basket Organic Groceries', amount: 4250.00, type: 'EXPENSE', category: 'Food & Dining', date: dateOn(0, 5), paymentMethod: 'Credit Card', notes: 'Pantry and organic produce', isRecurring: false },
+        { id: 'tx-6', title: 'Blue Tokai Roasters Coffee', amount: 480.00, type: 'EXPENSE', category: 'Food & Dining', date: dateOn(0, 7), paymentMethod: 'UPI', notes: 'Cold brew and artisanal roast', isRecurring: false },
+        { id: 'tx-7', title: 'Uber Premier Office Transit', amount: 620.00, type: 'EXPENSE', category: 'Transportation', date: dateOn(0, 9), paymentMethod: 'UPI', notes: 'Client meeting transit', isRecurring: false },
+        { id: 'tx-8', title: 'Airtel Gigabit Fiber Internet', amount: 1499.00, type: 'EXPENSE', category: 'Utilities', date: dateOn(0, 6), paymentMethod: 'Debit Card', notes: 'High-speed 1Gbps connection', isRecurring: true },
+        { id: 'tx-9', title: 'State Power & Electricity Bill', amount: 2840.00, type: 'EXPENSE', category: 'Utilities', date: dateOn(0, 11), paymentMethod: 'Debit Card', notes: 'Home studio power consumption', isRecurring: false },
+        { id: 'tx-10', title: 'Weekend Rooftop Bistro Dinner', amount: 3200.00, type: 'EXPENSE', category: 'Food & Dining', date: dateOn(0, 13), paymentMethod: 'Credit Card', notes: 'Dinner with colleagues', isRecurring: false },
+        { id: 'tx-11', title: 'Keychron Mechanical Keyboard', amount: 6499.00, type: 'EXPENSE', category: 'Shopping', date: dateOn(0, 14), paymentMethod: 'Credit Card', notes: 'Wireless tactile custom keyboard', isRecurring: false },
+        { id: 'tx-12', title: 'Netflix & Spotify Family Premium', amount: 849.00, type: 'EXPENSE', category: 'Entertainment', date: dateOn(0, 3), paymentMethod: 'Credit Card', notes: 'Monthly streaming memberships', isRecurring: true },
+        { id: 'tx-13', title: 'Metro Transit Card Smart Recharge', amount: 1000.00, type: 'EXPENSE', category: 'Transportation', date: dateOn(0, 10), paymentMethod: 'UPI', notes: 'Monthly metro pass', isRecurring: false },
+        { id: 'tx-14', title: 'Apollo Pharmacy & Wellness Pack', amount: 1850.00, type: 'EXPENSE', category: 'Healthcare', date: dateOn(0, 4), paymentMethod: 'Debit Card', notes: 'Multivitamins and diagnostics', isRecurring: false },
+
+        // ================= MONTH - 1 =================
+        { id: 'tx-15', title: 'Tech Corp Salary', amount: 85000.00, type: 'INCOME', category: 'Salary', date: dateOn(1, 1), paymentMethod: 'Bank Transfer', notes: 'Payroll direct deposit', isRecurring: true },
+        { id: 'tx-16', title: 'Consulting Honorarium', amount: 18000.00, type: 'INCOME', category: 'Freelance', date: dateOn(1, 15), paymentMethod: 'Bank Transfer', notes: 'Technical review', isRecurring: false },
+        { id: 'tx-17', title: 'Apartment Rent', amount: 26000.00, type: 'EXPENSE', category: 'Housing & Rent', date: dateOn(1, 2), paymentMethod: 'Bank Transfer', notes: 'Monthly rent', isRecurring: true },
+        { id: 'tx-18', title: 'Supermarket Groceries', amount: 8400.00, type: 'EXPENSE', category: 'Food & Dining', date: dateOn(1, 8), paymentMethod: 'Credit Card', notes: 'Restocking staples', isRecurring: false },
+        { id: 'tx-19', title: 'Rock Concert Live Event', amount: 4500.00, type: 'EXPENSE', category: 'Entertainment', date: dateOn(1, 20), paymentMethod: 'UPI', notes: 'VIP tickets', isRecurring: false },
+        { id: 'tx-20', title: 'Fuel & Car Maintenance', amount: 3800.00, type: 'EXPENSE', category: 'Transportation', date: dateOn(1, 12), paymentMethod: 'Credit Card', notes: 'Service and refill', isRecurring: false },
+
+        // ================= MONTH - 2 =================
+        { id: 'tx-21', title: 'Tech Corp Salary', amount: 85000.00, type: 'INCOME', category: 'Salary', date: dateOn(2, 1), paymentMethod: 'Bank Transfer', notes: 'Payroll', isRecurring: true },
+        { id: 'tx-22', title: 'Apartment Rent', amount: 26000.00, type: 'EXPENSE', category: 'Housing & Rent', date: dateOn(2, 2), paymentMethod: 'Bank Transfer', notes: 'Monthly rent', isRecurring: true },
+        { id: 'tx-23', title: 'Weekend Flight Tickets', amount: 9200.00, type: 'EXPENSE', category: 'Transportation', date: dateOn(2, 16), paymentMethod: 'Credit Card', notes: 'Tech conference flight', isRecurring: false },
+        { id: 'tx-24', title: 'Dining & Restaurants', amount: 6100.00, type: 'EXPENSE', category: 'Food & Dining', date: dateOn(2, 22), paymentMethod: 'Credit Card', notes: 'Conference dinners', isRecurring: false },
+
+        // ================= MONTH - 3 =================
+        { id: 'tx-25', title: 'Tech Corp Salary', amount: 80000.00, type: 'INCOME', category: 'Salary', date: dateOn(3, 1), paymentMethod: 'Bank Transfer', notes: 'Payroll', isRecurring: true },
+        { id: 'tx-26', title: 'App UI Design Project', amount: 32000.00, type: 'INCOME', category: 'Freelance', date: dateOn(3, 10), paymentMethod: 'Bank Transfer', notes: 'Design sprint payout', isRecurring: false },
+        { id: 'tx-27', title: 'Apartment Rent', amount: 26000.00, type: 'EXPENSE', category: 'Housing & Rent', date: dateOn(3, 2), paymentMethod: 'Bank Transfer', notes: 'Monthly rent', isRecurring: true },
+        { id: 'tx-28', title: 'Smart Home Gadgets', amount: 7800.00, type: 'EXPENSE', category: 'Shopping', date: dateOn(3, 18), paymentMethod: 'Credit Card', notes: 'IoT lighting', isRecurring: false },
+
+        // ================= MONTH - 4 =================
+        { id: 'tx-29', title: 'Tech Corp Salary', amount: 80000.00, type: 'INCOME', category: 'Salary', date: dateOn(4, 1), paymentMethod: 'Bank Transfer', notes: 'Payroll', isRecurring: true },
+        { id: 'tx-30', title: 'Apartment Rent', amount: 26000.00, type: 'EXPENSE', category: 'Housing & Rent', date: dateOn(4, 2), paymentMethod: 'Bank Transfer', notes: 'Monthly rent', isRecurring: true },
+        { id: 'tx-31', title: 'Groceries & Provisions', amount: 7600.00, type: 'EXPENSE', category: 'Food & Dining', date: dateOn(4, 14), paymentMethod: 'Credit Card', notes: 'Home essentials', isRecurring: false },
+
+        // ================= MONTH - 5 =================
+        { id: 'tx-32', title: 'Tech Corp Salary', amount: 80000.00, type: 'INCOME', category: 'Salary', date: dateOn(5, 1), paymentMethod: 'Bank Transfer', notes: 'Payroll', isRecurring: true },
+        { id: 'tx-33', title: 'Apartment Rent', amount: 26000.00, type: 'EXPENSE', category: 'Housing & Rent', date: dateOn(5, 2), paymentMethod: 'Bank Transfer', notes: 'Monthly rent', isRecurring: true },
+        { id: 'tx-34', title: 'Comprehensive Health Check', amount: 5500.00, type: 'EXPENSE', category: 'Healthcare', date: dateOn(5, 19), paymentMethod: 'Debit Card', notes: 'Preventative care', isRecurring: false }
       ],
       budgets: [
-        { id: 'bg-1', category: 'Food & Dining', limitAmount: 650.00, month: 'ALL' },
-        { id: 'bg-2', category: 'Housing & Rent', limitAmount: 1500.00, month: 'ALL' },
-        { id: 'bg-3', category: 'Transportation', limitAmount: 250.00, month: 'ALL' },
-        { id: 'bg-4', category: 'Shopping', limitAmount: 300.00, month: 'ALL' },
-        { id: 'bg-5', category: 'Utilities', limitAmount: 250.00, month: 'ALL' },
-        { id: 'bg-6', category: 'Entertainment', limitAmount: 150.00, month: 'ALL' },
-        { id: 'bg-7', category: 'Healthcare', limitAmount: 200.00, month: 'ALL' }
+        { id: 'bg-1', category: 'Food & Dining', limitAmount: 14000.00, month: 'ALL' },
+        { id: 'bg-2', category: 'Housing & Rent', limitAmount: 28000.00, month: 'ALL' },
+        { id: 'bg-3', category: 'Transportation', limitAmount: 5000.00, month: 'ALL' },
+        { id: 'bg-4', category: 'Shopping', limitAmount: 10000.00, month: 'ALL' },
+        { id: 'bg-5', category: 'Utilities', limitAmount: 6000.00, month: 'ALL' },
+        { id: 'bg-6', category: 'Entertainment', limitAmount: 4000.00, month: 'ALL' },
+        { id: 'bg-7', category: 'Healthcare', limitAmount: 5000.00, month: 'ALL' }
       ],
       goals: [
-        { id: 'g-1', name: 'Emergency Safety Fund', targetAmount: 10000.00, currentAmount: 7250.00, deadline: dStr(-120, 0), category: 'Safety', notes: '6 months essential living expenses', progressPercent: 72.5 },
-        { id: 'g-2', name: 'Tokyo Autumn Vacation', targetAmount: 3500.00, currentAmount: 2400.00, deadline: dStr(-210, 0), category: 'Travel', notes: 'Flights & culinary tour', progressPercent: 68.6 },
-        { id: 'g-3', name: 'M3 Max MacBook Pro', targetAmount: 3200.00, currentAmount: 3200.00, deadline: dStr(5, 0), category: 'Technology', notes: 'Completed engineering laptop', progressPercent: 100.0 },
-        { id: 'g-4', name: 'Home Studio Audio Gear', targetAmount: 1200.00, currentAmount: 480.00, deadline: dStr(-60, 0), category: 'Hobbies', notes: 'Acoustic treatment & speakers', progressPercent: 40.0 }
+        { id: 'g-1', name: 'Emergency Safety Reserve', targetAmount: 300000.00, currentAmount: 215000.00, deadline: dateOn(-4, 1), category: 'Safety', notes: '6 months essential fixed costs', progressPercent: 71.7 },
+        { id: 'g-2', name: 'Tokyo Autumn Flight & Stay', targetAmount: 150000.00, currentAmount: 105000.00, deadline: dateOn(-7, 1), category: 'Travel', notes: 'Direct flights & boutique hotel', progressPercent: 70.0 },
+        { id: 'g-3', name: 'M3 Max MacBook Pro', targetAmount: 199900.00, currentAmount: 199900.00, deadline: dateOn(0, 1), category: 'Technology', notes: 'Target fulfilled - Workstation upgraded', progressPercent: 100.0 },
+        { id: 'g-4', name: 'Home Studio Audio Setup', targetAmount: 50000.00, currentAmount: 22000.00, deadline: dateOn(-2, 1), category: 'Hobbies', notes: 'Genelec monitors & acoustic panels', progressPercent: 44.0 }
       ]
     };
   },
@@ -324,7 +358,11 @@ const LocalDatabase = {
   getSummary(targetMonth) {
     const data = this.getData();
     const all = data.transactions;
-    const currentMonth = (targetMonth && targetMonth.match(/^\d{4}-\d{2}$/)) ? targetMonth : new Date().toISOString().slice(0, 7);
+    const now = new Date();
+    const curYear = now.getFullYear();
+    const curMonthIdx = now.getMonth();
+    const defaultMonth = `${curYear}-${String(curMonthIdx + 1).padStart(2, '0')}`;
+    const currentMonth = (targetMonth && targetMonth.match(/^\d{4}-\d{2}$/)) ? targetMonth : defaultMonth;
 
     const monthTx = all.filter(t => t.date && t.date.startsWith(currentMonth));
     let monthIncome = 0;
@@ -358,12 +396,11 @@ const LocalDatabase = {
       else totalExpense += amt;
     });
 
-    // 6 Month Trends
+    // 6 Month Trends (Guaranteed local year-month)
     const trends = [];
-    const now = new Date();
     for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const mStr = d.toISOString().slice(0, 7);
+      const d = new Date(curYear, curMonthIdx - i, 1);
+      const mStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
       let inc = 0;
       let exp = 0;
       all.forEach(t => {
@@ -652,7 +689,7 @@ const LocalDatabase = {
       amount,
       type,
       category,
-      date: new Date().toISOString().slice(0, 10),
+      date: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
       paymentMethod,
       notes: notes + ' • Auto-parsed',
       isRecurring: false

@@ -45,13 +45,19 @@ const ChartManager = {
     const expenseData = trends.map(t => t.expense);
 
     // Subtle modern developer gradients
-    const incGradient = ctx.createLinearGradient(0, 0, 0, 260);
-    incGradient.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
-    incGradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+    let incGradient = 'rgba(16, 185, 129, 0.15)';
+    let expGradient = 'rgba(244, 63, 94, 0.12)';
+    try {
+      const g1 = ctx.createLinearGradient(0, 0, 0, 260);
+      g1.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
+      g1.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+      incGradient = g1;
 
-    const expGradient = ctx.createLinearGradient(0, 0, 0, 260);
-    expGradient.addColorStop(0, 'rgba(244, 63, 94, 0.2)');
-    expGradient.addColorStop(1, 'rgba(244, 63, 94, 0.0)');
+      const g2 = ctx.createLinearGradient(0, 0, 0, 260);
+      g2.addColorStop(0, 'rgba(244, 63, 94, 0.2)');
+      g2.addColorStop(1, 'rgba(244, 63, 94, 0.0)');
+      expGradient = g2;
+    } catch (e) {}
 
     this.cashFlowChart = new Chart(ctx, {
       type: 'line',

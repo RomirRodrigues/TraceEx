@@ -54,14 +54,14 @@
       <!-- Quick Action Controls -->
       <div class="flex items-center gap-2.5">
         <!-- Month Picker -->
-        <select id="month-selector" class="bg-zinc-900 text-xs font-mono text-zinc-300 border border-white/[0.08] rounded-md px-2.5 py-1.5 focus:outline-none focus:border-zinc-500 transition">
+        <select id="month-selector" class="bg-zinc-900 text-xs font-mono font-medium text-zinc-300 border border-white/[0.08] rounded-md px-2.5 py-1.5 focus:outline-none focus:border-zinc-500 transition min-w-[125px] sm:min-w-[145px] shrink-0">
           <!-- Populated by JavaScript -->
         </select>
 
         <!-- Currency Picker -->
-        <select id="currency-selector" class="bg-zinc-900 text-xs font-mono text-zinc-300 border border-white/[0.08] rounded-md px-2 py-1.5 focus:outline-none focus:border-zinc-500 transition">
+        <select id="currency-selector" class="bg-zinc-900 text-xs font-mono text-zinc-300 border border-white/[0.08] rounded-md px-2 py-1.5 focus:outline-none focus:border-zinc-500 transition shrink-0">
+          <option value="₹" selected>INR (₹)</option>
           <option value="$">USD ($)</option>
-          <option value="₹">INR (₹)</option>
           <option value="€">EUR (€)</option>
           <option value="£">GBP (£)</option>
           <option value="¥">JPY (¥)</option>

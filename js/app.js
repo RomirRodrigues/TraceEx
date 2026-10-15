@@ -4,9 +4,9 @@
 const App = {
   state: {
     activeTab: 'dashboard',
-    currentMonth: new Date().toISOString().slice(0, 7), // YYYY-MM
-    currency: '$',
-    currencyCode: 'USD',
+    currentMonth: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`,
+    currency: '₹',
+    currencyCode: 'INR',
     theme: 'dark',
     summary: null,
     transactions: [],
@@ -140,8 +140,8 @@ const App = {
     const now = new Date();
     for (let i = 0; i < 12; i++) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const val = d.toISOString().slice(0, 7);
-      const label = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+      const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const label = d.toLocaleString('default', { month: 'short', year: 'numeric' });
       const opt = document.createElement('option');
       opt.value = val;
       opt.textContent = label;
@@ -469,7 +469,7 @@ const App = {
     const form = document.getElementById('tx-form');
 
     form.reset();
-    document.getElementById('tx-date').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('tx-date').value = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
 
     if (editId) {
       titleEl.textContent = 'Edit Transaction';
