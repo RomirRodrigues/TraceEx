@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TraceEx — The Ultimate Expense Tracker</title>
+  <title>TraceEx — Developer Financial Ledger</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   
-  <!-- Custom Modern Stylesheet -->
+  <!-- 21st.dev Style Sheet -->
   <link rel="stylesheet" href="css/style.css">
   
   <script>
@@ -19,11 +19,9 @@
       theme: {
         extend: {
           colors: {
-            brand: {
-              50: '#eef2ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca'
+            zinc: {
+              850: '#1f1f23',
+              950: '#09090b'
             }
           }
         }
@@ -31,38 +29,37 @@
     }
   </script>
 </head>
-<body class="text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-[#09090b] text-zinc-100 bg-developer-grid antialiased selection:bg-zinc-800 selection:text-white">
 
-  <!-- ================= TOP NAVIGATION BAR ================= -->
-  <header class="sticky top-0 z-40 backdrop-blur-md bg-slate-900/80 border-b border-slate-800/80 no-print">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+  <!-- ================= TOP COMMAND HEADER ================= -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-zinc-950/80 border-b border-white/[0.08] no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
       
-      <!-- Brand Logo -->
+      <!-- Brand & Engine Status -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-          </svg>
-        </div>
-        <div>
+        <a href="javascript:void(0)" onclick="App.switchTab('dashboard')" class="flex items-center gap-2.5 group">
+          <div class="w-7 h-7 rounded-md bg-white flex items-center justify-center text-zinc-950 shadow-sm group-hover:scale-105 transition">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+          </div>
           <div class="flex items-center gap-2">
-            <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">TraceEx</span>
-            <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro</span>
+            <span class="font-semibold tracking-tight text-white text-sm">TraceEx</span>
+            <span class="font-mono text-[10px] text-zinc-400 px-1.5 py-0.5 rounded border border-white/[0.08] bg-white/[0.03]">v2.1</span>
             <span id="engine-mode-badge"></span>
           </div>
-          <p class="text-[11px] text-slate-400 font-medium hidden sm:block">The Ultimate Expense & Financial Tracker</p>
-        </div>
+        </a>
       </div>
 
       <!-- Quick Action Controls -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2.5">
         <!-- Month Picker -->
-        <select id="month-selector" class="bg-slate-800/90 text-xs sm:text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <select id="month-selector" class="bg-zinc-900 text-xs font-mono text-zinc-300 border border-white/[0.08] rounded-md px-2.5 py-1.5 focus:outline-none focus:border-zinc-500 transition">
           <!-- Populated by JavaScript -->
         </select>
 
         <!-- Currency Picker -->
-        <select id="currency-selector" class="bg-slate-800/90 text-xs sm:text-sm text-slate-200 border border-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono-num">
+        <select id="currency-selector" class="bg-zinc-900 text-xs font-mono text-zinc-300 border border-white/[0.08] rounded-md px-2 py-1.5 focus:outline-none focus:border-zinc-500 transition">
           <option value="$">USD ($)</option>
           <option value="₹">INR (₹)</option>
           <option value="€">EUR (€)</option>
@@ -73,49 +70,56 @@
         </select>
 
         <!-- Theme Toggle -->
-        <button id="theme-toggle-btn" title="Toggle Dark/Light Mode" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition border border-slate-700">
-          <span id="theme-icon">☀️</span>
+        <button id="theme-toggle-btn" title="Toggle Theme" class="p-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition border border-white/[0.08]">
+          <span id="theme-icon">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </span>
         </button>
 
-        <!-- Live Mobile Sync Button -->
-        <button onclick="App.openMobileSyncModal()" title="Connect Live Mobile Payment Apps & SMS" class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg shadow-lg shadow-emerald-500/25 transition">
-          <span class="text-sm">📱</span>
-          <span class="hidden lg:inline">Live Mobile Sync</span>
-          <span class="lg:hidden">Sync</span>
+        <!-- Mobile Webhook Trigger -->
+        <button onclick="App.openMobileSyncModal()" title="Mobile Payment Sync" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-mono border border-white/[0.08] transition active:scale-95">
+          <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <span>Webhook Sync</span>
         </button>
 
         <!-- Add Transaction Button -->
-        <button id="btn-add-tx" class="flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs sm:text-sm font-semibold px-3.5 py-1.5 rounded-lg shadow-lg shadow-indigo-500/25 transition">
-          <span class="text-base leading-none">+</span>
-          <span class="hidden md:inline">Add Transaction</span>
-          <span class="md:hidden">Add</span>
-          <kbd class="hidden lg:inline-block ml-1 text-[10px] bg-indigo-700/60 px-1.5 py-0.5 rounded font-mono">Ctrl+K</kbd>
+        <button id="btn-add-tx" class="flex items-center gap-1.5 bg-white hover:bg-zinc-200 text-zinc-950 font-medium text-xs px-3 py-1.5 rounded-md shadow-sm transition active:scale-95">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>New Entry</span>
+          <kbd class="kbd-shortcut hidden md:inline-block ml-1">⌘K</kbd>
         </button>
       </div>
 
     </div>
   </header>
 
-  <!-- ================= SUB-NAVIGATION TABS ================= -->
+  <!-- ================= 21ST.DEV PILL NAVIGATION TABS ================= -->
   <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5 no-print">
-    <div class="flex items-center space-x-1 sm:space-x-2 p-1.5 bg-slate-900/60 border border-slate-800 rounded-xl overflow-x-auto">
-      <button data-tab-target="dashboard" class="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-indigo-600 text-white transition whitespace-nowrap">
-        <span>📊</span> Dashboard
+    <div class="flex items-center space-x-1 p-1 bg-zinc-900/60 border border-white/[0.08] rounded-lg overflow-x-auto">
+      <button data-tab-target="dashboard" class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md bg-zinc-800 text-white shadow-sm border border-zinc-700/60 transition whitespace-nowrap">
+        <span>Overview</span>
       </button>
-      <button data-tab-target="transactions" class="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg text-slate-400 hover:bg-slate-800 transition whitespace-nowrap">
-        <span>💳</span> Transactions
+      <button data-tab-target="transactions" class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition whitespace-nowrap">
+        <span>Transactions</span>
       </button>
-      <button data-tab-target="budgets" class="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg text-slate-400 hover:bg-slate-800 transition whitespace-nowrap">
-        <span>🎯</span> Budgets & Goals
+      <button data-tab-target="budgets" class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition whitespace-nowrap">
+        <span>Budgets & Goals</span>
       </button>
-      <button data-tab-target="mobile-sync" class="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg text-emerald-400 hover:bg-slate-800 transition whitespace-nowrap border border-emerald-500/20">
-        <span>📱</span> Mobile Live Sync
+      <button data-tab-target="mobile-sync" class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md text-zinc-400 hover:text-emerald-400 hover:bg-zinc-800/40 transition whitespace-nowrap">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Mobile Live Sync</span>
       </button>
-      <button data-tab-target="analytics" class="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg text-slate-400 hover:bg-slate-800 transition whitespace-nowrap">
-        <span>📈</span> Analytics & Reports
+      <button data-tab-target="analytics" class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition whitespace-nowrap">
+        <span>Analytics</span>
       </button>
-      <button data-tab-target="settings" class="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg text-slate-400 hover:bg-slate-800 transition whitespace-nowrap">
-        <span>⚙️</span> Settings & Data
+      <button data-tab-target="settings" class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition whitespace-nowrap">
+        <span>Settings</span>
       </button>
     </div>
   </nav>
@@ -124,79 +128,79 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
     <!-- ================= TAB 1: DASHBOARD ================= -->
-    <section data-tab-content="dashboard" class="space-y-6">
+    <section data-tab-content="dashboard" class="space-y-6 motion-tab-pane">
 
       <!-- Metrics Cards Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- Net Monthly Balance -->
-        <div class="glass-card glass-card-interactive p-5">
-          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-            <span>Monthly Cash Flow</span>
-            <span class="text-lg">⚖️</span>
+        <div class="bento-card bento-card-interactive p-4">
+          <div class="flex items-center justify-between text-zinc-400 text-xs font-mono uppercase tracking-wider mb-2">
+            <span>Net Balance</span>
+            <span class="font-mono text-[10px] text-zinc-500">M-T-D</span>
           </div>
-          <div id="metric-balance" class="text-3xl font-extrabold font-mono-num text-emerald-400">$0.00</div>
-          <div class="text-xs text-slate-400 mt-2 flex items-center justify-between">
-            <span>Income minus expenses</span>
-            <span class="text-indigo-400 font-medium">Selected Month</span>
+          <div id="metric-balance" class="text-2xl font-bold font-mono-num text-emerald-400">$0.00</div>
+          <div class="text-[11px] text-zinc-500 font-mono mt-2 flex items-center justify-between">
+            <span>Inflow minus Outflow</span>
+            <span class="text-zinc-400">Current Month</span>
           </div>
         </div>
 
         <!-- Monthly Income -->
-        <div class="glass-card glass-card-interactive p-5">
-          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+        <div class="bento-card bento-card-interactive p-4">
+          <div class="flex items-center justify-between text-zinc-400 text-xs font-mono uppercase tracking-wider mb-2">
             <span>Total Inflow</span>
-            <span class="text-lg">📥</span>
+            <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V8H8"/></svg>
           </div>
-          <div id="metric-income" class="text-3xl font-extrabold font-mono-num text-emerald-400">+$0.00</div>
-          <div class="text-xs text-slate-400 mt-2">
-            Salary, freelance, & investments
+          <div id="metric-income" class="text-2xl font-bold font-mono-num text-emerald-400">+$0.00</div>
+          <div class="text-[11px] text-zinc-500 font-mono mt-2">
+            Payroll, consulting & assets
           </div>
         </div>
 
         <!-- Monthly Expenses -->
-        <div class="glass-card glass-card-interactive p-5">
-          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+        <div class="bento-card bento-card-interactive p-4">
+          <div class="flex items-center justify-between text-zinc-400 text-xs font-mono uppercase tracking-wider mb-2">
             <span>Total Outflow</span>
-            <span class="text-lg">📤</span>
+            <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 7l-9.2 9.2M7 7v9h9"/></svg>
           </div>
-          <div id="metric-expenses" class="text-3xl font-extrabold font-mono-num text-rose-400">-$0.00</div>
-          <div class="text-xs text-slate-400 mt-2">
-            Living costs & purchases
+          <div id="metric-expenses" class="text-2xl font-bold font-mono-num text-zinc-200">-$0.00</div>
+          <div class="text-[11px] text-zinc-500 font-mono mt-2">
+            Fixed overhead & operations
           </div>
         </div>
 
         <!-- Savings Rate % -->
-        <div class="glass-card glass-card-interactive p-5">
-          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+        <div class="bento-card bento-card-interactive p-4">
+          <div class="flex items-center justify-between text-zinc-400 text-xs font-mono uppercase tracking-wider mb-2">
             <span>Savings Efficiency</span>
-            <span class="text-lg">🛡️</span>
+            <span class="font-mono text-[10px] text-zinc-500">RATIO</span>
           </div>
-          <div id="metric-savings-rate" class="text-3xl font-extrabold font-mono-num text-indigo-400">0%</div>
-          <div class="w-full bg-slate-800 rounded-full h-1.5 mt-2.5 overflow-hidden">
-            <div id="metric-savings-bar" class="bg-indigo-500 h-full transition-all duration-500" style="width: 0%"></div>
+          <div id="metric-savings-rate" class="text-2xl font-bold font-mono-num text-white">0%</div>
+          <div class="w-full bg-zinc-800 rounded-full h-1 mt-2.5 overflow-hidden">
+            <div id="metric-savings-bar" class="bg-white h-full transition-all duration-500" style="width: 0%"></div>
           </div>
-          <div class="text-[11px] text-slate-400 mt-1 flex justify-between">
-            <span>Goal: > 25%</span>
-            <span class="font-bold text-slate-300">Savings Rate</span>
+          <div class="text-[10px] text-zinc-500 font-mono mt-1 flex justify-between">
+            <span>Benchmark: > 25%</span>
+            <span class="text-zinc-400">Efficiency</span>
           </div>
         </div>
 
       </div>
 
       <!-- Charts Section: Cashflow Line + Category Donut -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         
-        <!-- 6-Month Inflow vs Outflow Trends (2 cols) -->
-        <div class="lg:col-span-2 glass-card p-6">
+        <!-- Trajectory Chart (2 cols) -->
+        <div class="lg:col-span-2 bento-card p-5">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="text-base font-bold text-slate-100">Financial Trajectory</h3>
-              <p class="text-xs text-slate-400">Income vs. Expense over the last 6 months</p>
+              <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200">Cash Flow Trajectory</h3>
+              <p class="text-[11px] text-zinc-500 font-mono">6-month rolling inflow vs outflow</p>
             </div>
-            <div class="flex items-center gap-3 text-xs">
-              <span class="inline-flex items-center gap-1 text-emerald-400 font-semibold"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Income</span>
-              <span class="inline-flex items-center gap-1 text-rose-400 font-semibold"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Expense</span>
+            <div class="flex items-center gap-3 text-[11px] font-mono">
+              <span class="inline-flex items-center gap-1.5 text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Inflow</span>
+              <span class="inline-flex items-center gap-1.5 text-rose-400"><span class="w-2 h-2 rounded-full bg-rose-400"></span> Outflow</span>
             </div>
           </div>
           <div class="h-64 sm:h-72 w-full">
@@ -205,10 +209,10 @@
         </div>
 
         <!-- Category Spend Donut (1 col) -->
-        <div class="glass-card p-6 flex flex-col justify-between">
+        <div class="bento-card p-5 flex flex-col justify-between">
           <div class="mb-2">
-            <h3 class="text-base font-bold text-slate-100">Category Breakdown</h3>
-            <p class="text-xs text-slate-400">Expense distribution for the selected month</p>
+            <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200">Category Allocation</h3>
+            <p class="text-[11px] text-zinc-500 font-mono">Proportional monthly expense breakdown</p>
           </div>
           <div class="h-64 relative flex items-center justify-center">
             <canvas id="category-donut-chart"></canvas>
@@ -218,38 +222,38 @@
       </div>
 
       <!-- Bottom Dashboard Grid: Budget Alerts & Recent Transactions -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         
         <!-- Budget Health Monitor -->
-        <div class="glass-card p-6 flex flex-col justify-between">
+        <div class="bento-card p-5 flex flex-col justify-between">
           <div>
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between mb-3 border-b border-white/[0.08] pb-3">
               <div>
-                <h3 class="text-base font-bold text-slate-100">Budget Health</h3>
-                <p class="text-xs text-slate-400">Current spending against monthly caps</p>
+                <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200">Active Budget Thresholds</h3>
+                <p class="text-[11px] text-zinc-500 font-mono">Spending against defined caps</p>
               </div>
-              <button onclick="App.openBudgetModal()" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold">+ Set Cap</button>
+              <button onclick="App.openBudgetModal()" class="text-xs font-mono text-zinc-400 hover:text-white underline">+ Cap</button>
             </div>
-            <div id="budget-alerts-container" class="space-y-4">
+            <div id="budget-alerts-container" class="space-y-3 pt-1">
               <!-- Populated by JS -->
             </div>
           </div>
-          <div class="pt-4 mt-4 border-t border-slate-800 text-center">
-            <a href="javascript:void(0)" onclick="App.switchTab('budgets')" class="text-xs text-indigo-400 hover:underline font-semibold">View All Budgets & Goals →</a>
+          <div class="pt-3 mt-4 border-t border-white/[0.08] text-center">
+            <a href="javascript:void(0)" onclick="App.switchTab('budgets')" class="text-xs font-mono text-zinc-400 hover:text-white transition">Configure All Budgets & Targets →</a>
           </div>
         </div>
 
         <!-- Recent Transactions -->
-        <div class="lg:col-span-2 glass-card p-6 flex flex-col justify-between">
+        <div class="lg:col-span-2 bento-card p-5 flex flex-col justify-between">
           <div>
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between mb-3 border-b border-white/[0.08] pb-3">
               <div>
-                <h3 class="text-base font-bold text-slate-100">Recent Transactions</h3>
-                <p class="text-xs text-slate-400">Latest recorded income & expenditures</p>
+                <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200">Recent Ledger Activity</h3>
+                <p class="text-[11px] text-zinc-500 font-mono">Chronological transaction stream</p>
               </div>
-              <a href="javascript:void(0)" onclick="App.switchTab('transactions')" class="text-xs text-indigo-400 hover:underline font-semibold">View Full Ledger →</a>
+              <a href="javascript:void(0)" onclick="App.switchTab('transactions')" class="text-xs font-mono text-zinc-400 hover:text-white transition">Full Ledger →</a>
             </div>
-            <div id="recent-tx-list" class="space-y-2">
+            <div id="recent-tx-list" class="space-y-1">
               <!-- Populated by JS -->
             </div>
           </div>
@@ -260,31 +264,31 @@
     </section>
 
     <!-- ================= TAB 2: TRANSACTIONS MANAGER ================= -->
-    <section data-tab-content="transactions" class="space-y-6 hidden">
+    <section data-tab-content="transactions" class="space-y-5 hidden motion-tab-pane">
       
       <!-- Filter Toolbar -->
-      <div class="glass-card p-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div class="bento-card p-3.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
           
           <!-- Search Input -->
           <div class="lg:col-span-2 relative">
-            <input id="filter-search" type="text" placeholder="Search by merchant, note, or category..." 
-                   class="w-full bg-slate-900/80 text-sm text-slate-100 border border-slate-700/80 rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <span class="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
+            <input id="filter-search" type="text" placeholder="Search merchant, notes, tags..." 
+                   class="w-full bg-zinc-900 text-xs text-zinc-100 border border-white/[0.08] rounded-md pl-8 pr-3 py-2 focus:outline-none focus:border-zinc-500 font-mono">
+            <svg class="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
           </div>
 
           <!-- Type Filter -->
           <div>
-            <select id="filter-type" class="w-full bg-slate-900/80 text-sm text-slate-100 border border-slate-700/80 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="ALL">All Types (Income & Expense)</option>
-              <option value="EXPENSE">Expenses Only</option>
-              <option value="INCOME">Income Only</option>
+            <select id="filter-type" class="w-full bg-zinc-900 text-xs font-mono text-zinc-300 border border-white/[0.08] rounded-md px-2.5 py-2 focus:outline-none focus:border-zinc-500">
+              <option value="ALL">All Flows</option>
+              <option value="EXPENSE">Outflow Only</option>
+              <option value="INCOME">Inflow Only</option>
             </select>
           </div>
 
           <!-- Category Filter -->
           <div>
-            <select id="filter-category" class="w-full bg-slate-900/80 text-sm text-slate-100 border border-slate-700/80 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <select id="filter-category" class="w-full bg-zinc-900 text-xs font-mono text-zinc-300 border border-white/[0.08] rounded-md px-2.5 py-2 focus:outline-none focus:border-zinc-500">
               <option value="ALL">All Categories</option>
               <option value="Food & Dining">Food & Dining</option>
               <option value="Housing & Rent">Housing & Rent</option>
@@ -302,8 +306,8 @@
 
           <!-- Payment Method Filter -->
           <div>
-            <select id="filter-payment" class="w-full bg-slate-900/80 text-sm text-slate-100 border border-slate-700/80 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="ALL">All Payment Modes</option>
+            <select id="filter-payment" class="w-full bg-zinc-900 text-xs font-mono text-zinc-300 border border-white/[0.08] rounded-md px-2.5 py-2 focus:outline-none focus:border-zinc-500">
+              <option value="ALL">All Payment Channels</option>
               <option value="Credit Card">Credit Card</option>
               <option value="Debit Card">Debit Card</option>
               <option value="UPI">UPI</option>
@@ -315,37 +319,38 @@
 
         </div>
 
-        <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800 text-xs">
-          <div class="flex items-center gap-2">
-            <span id="tx-count-badge" class="px-2.5 py-1 rounded bg-slate-800 text-slate-300 font-mono-num font-semibold">0 Records</span>
-            <button id="btn-reset-filters" class="text-slate-400 hover:text-slate-200 underline">Clear Filters</button>
+        <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/[0.08] text-xs">
+          <div class="flex items-center gap-2 font-mono">
+            <span id="tx-count-badge" class="px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-white/[0.08] text-[11px]">0 Records</span>
+            <button id="btn-reset-filters" class="text-zinc-500 hover:text-zinc-300 underline text-[11px]">Reset</button>
           </div>
-          <div class="flex items-center gap-3">
-            <button onclick="API.triggerCsvDownload()" class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold transition border border-slate-700">
-              <span>📥</span> Export CSV
+          <div class="flex items-center gap-2">
+            <button onclick="API.triggerCsvDownload()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs transition border border-white/[0.08]">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Export CSV</span>
             </button>
-            <button onclick="App.openTransactionModal()" class="flex items-center gap-1 px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition">
-              <span>+</span> New Transaction
+            <button onclick="App.openTransactionModal()" class="flex items-center gap-1 px-3 py-1.5 rounded-md bg-white hover:bg-zinc-200 text-zinc-950 font-medium text-xs transition active:scale-95">
+              <span>+ New Entry</span>
             </button>
           </div>
         </div>
       </div>
 
       <!-- Transactions Ledger Table -->
-      <div class="glass-card overflow-hidden">
+      <div class="bento-card overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="border-b border-slate-800 bg-slate-900/70 text-slate-400 text-xs uppercase font-semibold">
-                <th class="py-3 px-4">Date</th>
-                <th class="py-3 px-4">Merchant / Title</th>
-                <th class="py-3 px-4">Category</th>
-                <th class="py-3 px-4">Payment</th>
-                <th class="py-3 px-4 text-right">Amount</th>
-                <th class="py-3 px-4 text-right">Actions</th>
+              <tr class="border-b border-white/[0.08] bg-zinc-950/90 text-zinc-500 text-[11px] font-mono uppercase tracking-wider">
+                <th class="py-2.5 px-4 font-normal">Timestamp</th>
+                <th class="py-2.5 px-4 font-normal">Entity / Description</th>
+                <th class="py-2.5 px-4 font-normal">Category</th>
+                <th class="py-2.5 px-4 font-normal">Channel</th>
+                <th class="py-2.5 px-4 font-normal text-right">Magnitude</th>
+                <th class="py-2.5 px-4 font-normal text-right">Actions</th>
               </tr>
             </thead>
-            <tbody id="tx-table-body" class="divide-y divide-slate-800/60">
+            <tbody id="tx-table-body" class="divide-y divide-white/[0.04]">
               <!-- Rendered via App.loadTransactionsTable() -->
             </tbody>
           </table>
@@ -355,42 +360,38 @@
     </section>
 
     <!-- ================= TAB 3: BUDGETS & GOALS ================= -->
-    <section data-tab-content="budgets" class="space-y-8 hidden">
+    <section data-tab-content="budgets" class="space-y-8 hidden motion-tab-pane">
       
       <!-- Category Budgets Section -->
       <div>
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-3 border-b border-white/[0.08] pb-3">
           <div>
-            <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
-              <span>🎯</span> Monthly Category Budgets
-            </h3>
-            <p class="text-xs text-slate-400">Set maximum expenditure thresholds to curb excessive spending</p>
+            <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200">Category Budgets</h3>
+            <p class="text-[11px] text-zinc-500 font-mono">Enforce monthly ceiling caps on variable expenses</p>
           </div>
-          <button onclick="App.openBudgetModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-lg transition shadow-md">
-            + Set New Budget
+          <button onclick="App.openBudgetModal()" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-mono text-xs rounded-md border border-white/[0.08] transition">
+            + Define Budget
           </button>
         </div>
 
-        <div id="budgets-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div id="budgets-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Populated by JS -->
         </div>
       </div>
 
       <!-- Financial Savings Goals Section -->
       <div>
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-3 border-b border-white/[0.08] pb-3">
           <div>
-            <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
-              <span>🏆</span> Financial Savings Goals
-            </h3>
-            <p class="text-xs text-slate-400">Track and allocate funds towards long-term milestones</p>
+            <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200">Milestone Targets</h3>
+            <p class="text-[11px] text-zinc-500 font-mono">Long-term liquidity and asset accumulation targets</p>
           </div>
-          <button onclick="App.openGoalModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-lg transition shadow-md">
-            + Add Savings Goal
+          <button onclick="App.openGoalModal()" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-mono text-xs rounded-md border border-white/[0.08] transition">
+            + Create Target
           </button>
         </div>
 
-        <div id="goals-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div id="goals-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Populated by JS -->
         </div>
       </div>
@@ -398,161 +399,142 @@
     </section>
 
     <!-- ================= TAB 3.5: MOBILE LIVE SYNC ================= -->
-    <section data-tab-content="mobile-sync" class="space-y-6 hidden">
+    <section data-tab-content="mobile-sync" class="space-y-6 hidden motion-tab-pane">
       
-      <!-- Top Banner / Intro -->
-      <div class="glass-card p-6 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-indigo-950/40 border-emerald-500/30">
+      <!-- Top Banner -->
+      <div class="bento-card p-5 bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950 border-white/[0.12]">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <div class="flex items-center gap-2 mb-1">
-              <span class="text-2xl">📱</span>
-              <h2 class="text-xl font-extrabold text-white">Live Mobile Payment & App Sync</h2>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 animate-pulse">Live Link</span>
+              <span class="font-mono text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">LIVE WEBHOOK</span>
+              <h2 class="text-sm font-semibold tracking-tight text-white font-mono">Mobile Payment & Banking Webhook Gateway</h2>
             </div>
-            <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
-              Connect Google Pay, PhonePe, Paytm, BHIM UPI, Apple Pay, and Bank SMS directly to TraceEx. Paste or forward payment alerts, or set up instant zero-touch background automation with your mobile device!
+            <p class="text-xs text-zinc-400 max-w-2xl font-mono leading-relaxed mt-1">
+              Connect Google Pay, PhonePe, Paytm, BHIM, Apple Pay, and Bank SMS directly into TraceEx. Automated background ingestion or instant heuristic notification parsing.
             </p>
           </div>
-          <button onclick="App.copyWebhookUrl()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center gap-1.5 whitespace-nowrap">
-            <span>🔗</span> Copy Live Webhook URL
+          <button onclick="App.copyWebhookUrl()" class="px-3.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-mono text-xs rounded-md border border-white/[0.12] transition flex items-center gap-1.5 active:scale-95">
+            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <span>Copy Webhook URL</span>
           </button>
         </div>
       </div>
 
       <!-- Main Two-Column Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         
         <!-- Column 1: Live SMS / Notification Auto-Reader -->
-        <div class="glass-card p-6 space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="bento-card p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
             <div>
-              <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
-                <span>⚡</span> Smart Payment Auto-Reader
-              </h3>
-              <p class="text-xs text-slate-400">Paste any payment notification, UPI alert, or bank SMS</p>
+              <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200">Payment Alert Inspector</h3>
+              <p class="text-[11px] text-zinc-500 font-mono">Parse raw SMS / notification payload</p>
             </div>
-            <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Auto AI/Regex</span>
+            <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Heuristic Engine</span>
           </div>
 
           <!-- Quick Test Chips -->
           <div>
-            <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Test with real-world samples:</div>
+            <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mb-2">Simulate live payment alert:</div>
             <div class="flex flex-wrap gap-1.5">
-              <button onclick="App.loadSampleSms('swiggy')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 transition">🍔 Swiggy UPI</button>
-              <button onclick="App.loadSampleSms('starbucks')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 transition">☕ Starbucks GPay</button>
-              <button onclick="App.loadSampleSms('shell')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 transition">⛽ Shell Card</button>
-              <button onclick="App.loadSampleSms('salary')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 transition">💵 Salary Credit</button>
-              <button onclick="App.loadSampleSms('netflix')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 transition">🎬 Apple Pay</button>
+              <button onclick="App.loadSampleSms('swiggy')" class="px-2 py-1 text-[11px] font-mono rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/[0.08] transition">swiggy.upi</button>
+              <button onclick="App.loadSampleSms('starbucks')" class="px-2 py-1 text-[11px] font-mono rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/[0.08] transition">starbucks.gpay</button>
+              <button onclick="App.loadSampleSms('shell')" class="px-2 py-1 text-[11px] font-mono rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/[0.08] transition">shell.card</button>
+              <button onclick="App.loadSampleSms('salary')" class="px-2 py-1 text-[11px] font-mono rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/[0.08] transition">payroll.salary</button>
+              <button onclick="App.loadSampleSms('netflix')" class="px-2 py-1 text-[11px] font-mono rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/[0.08] transition">applepay.sub</button>
             </div>
           </div>
 
           <!-- Text Area -->
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Notification / SMS Text:</label>
-            <textarea id="sms-input-text" rows="4" oninput="App.parseSmsLive()" placeholder="Paste message from Google Pay, PhonePe, Paytm, HDFC, SBI, ICICI, Apple Pay, Chase..." 
-                      class="w-full bg-slate-900/90 text-sm text-slate-100 border border-slate-700 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-xs"></textarea>
+            <textarea id="sms-input-text" rows="3" oninput="App.parseSmsLive()" placeholder="Paste transaction notification from Google Pay, PhonePe, Paytm, Chase, SBI, ICICI..." 
+                      class="w-full bg-zinc-900 text-xs font-mono text-zinc-100 border border-white/[0.08] rounded-md p-3 focus:outline-none focus:border-zinc-500 leading-relaxed"></textarea>
           </div>
 
           <div class="flex items-center justify-between pt-1">
-            <button onclick="document.getElementById('sms-input-text').value = ''; document.getElementById('parsed-result-card').classList.add('hidden');" class="text-xs text-slate-400 hover:text-slate-200">Clear</button>
-            <button onclick="App.parseSmsLive()" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg transition shadow">
-              ⚡ Detect & Extract
+            <button onclick="document.getElementById('sms-input-text').value = ''; document.getElementById('parsed-result-card').classList.add('hidden');" class="text-[11px] font-mono text-zinc-500 hover:text-zinc-300">clear</button>
+            <button onclick="App.parseSmsLive()" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-mono rounded-md border border-white/[0.08] transition">
+              Parse Payload
             </button>
           </div>
 
-          <!-- Parsed Result Live Card (hidden until parsed) -->
-          <div id="parsed-result-card" class="p-4 rounded-xl bg-slate-900/95 border border-emerald-500/40 shadow-xl space-y-3 hidden animate-pop-in">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-              <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Detected Transaction
+          <!-- Parsed Result Live Card -->
+          <div id="parsed-result-card" class="p-3.5 rounded-md bg-zinc-900/90 border border-white/[0.12] space-y-2.5 hidden motion-spring-in">
+            <div class="flex items-center justify-between border-b border-white/[0.08] pb-2">
+              <span class="text-[10px] font-mono text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Extracted Transaction
               </span>
-              <span id="parsed-type" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">EXPENSE</span>
+              <span id="parsed-type" class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400">EXPENSE</span>
             </div>
 
             <div class="flex items-baseline justify-between">
               <div>
-                <div id="parsed-title" class="text-base font-bold text-white">Merchant Name</div>
-                <div id="parsed-notes" class="text-xs text-slate-400">Notes</div>
+                <div id="parsed-title" class="text-sm font-semibold text-white tracking-tight">Merchant</div>
+                <div id="parsed-notes" class="text-[11px] font-mono text-zinc-500">Details</div>
               </div>
-              <div id="parsed-amount" class="text-xl font-bold font-mono-num text-rose-400">-$0.00</div>
+              <div id="parsed-amount" class="text-lg font-bold font-mono-num text-zinc-200">-$0.00</div>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-800/80">
+            <div class="grid grid-cols-2 gap-2 text-[11px] font-mono pt-2 border-t border-white/[0.08]">
               <div>
-                <span class="text-slate-400">Category:</span>
-                <span id="parsed-category" class="font-semibold text-indigo-300 ml-1">Food & Dining</span>
+                <span class="text-zinc-500">Category:</span>
+                <span id="parsed-category" class="font-medium text-zinc-300 ml-1">Food</span>
               </div>
               <div>
-                <span class="text-slate-400">Payment:</span>
-                <span id="parsed-payment" class="font-semibold text-slate-200 ml-1 font-mono-num">UPI</span>
+                <span class="text-zinc-500">Channel:</span>
+                <span id="parsed-payment" class="font-medium text-zinc-300 ml-1">UPI</span>
               </div>
             </div>
 
-            <button onclick="App.confirmParsedTx()" class="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-sm rounded-lg shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-1.5">
-              <span>✓</span> Add to Live Ledger
+            <button onclick="App.confirmParsedTx()" class="w-full py-2 bg-white hover:bg-zinc-200 text-zinc-950 font-medium text-xs rounded-md shadow-sm transition active:scale-95">
+              Confirm & Ingest Transaction
             </button>
           </div>
 
         </div>
 
-        <!-- Column 2: 100% Background Automation Guide (MacroDroid / Tasker / Shortcuts) -->
-        <div class="glass-card p-6 space-y-4 flex flex-col justify-between">
+        <!-- Column 2: Webhook Automation Developer Spec -->
+        <div class="bento-card p-5 space-y-4 flex flex-col justify-between">
           <div>
-            <div class="border-b border-slate-800 pb-3 mb-3">
-              <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
-                <span>🤖</span> Zero-Touch Real-Time Mobile Automation
-              </h3>
-              <p class="text-xs text-slate-400">How real expense apps log live data without typing</p>
+            <div class="border-b border-white/[0.08] pb-3 mb-3">
+              <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200">Background Webhook Ingestion</h3>
+              <p class="text-[11px] text-zinc-500 font-mono">Zero-touch real-time synchronization</p>
             </div>
 
             <!-- Webhook Box -->
-            <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2 mb-4">
-              <div class="flex items-center justify-between text-xs">
-                <span class="font-semibold text-slate-300">Your Live Webhook Endpoint:</span>
-                <button onclick="App.copyWebhookUrl()" class="text-indigo-400 hover:text-indigo-300 text-xs font-semibold underline">Copy URL</button>
+            <div class="p-3 rounded-md bg-zinc-900 border border-white/[0.08] space-y-2 mb-3">
+              <div class="flex items-center justify-between text-xs font-mono">
+                <span class="text-zinc-400">ENDPOINT</span>
+                <button onclick="App.copyWebhookUrl()" class="text-zinc-400 hover:text-white underline text-[11px]">copy</button>
               </div>
-              <code class="block text-xs font-mono text-emerald-400 bg-slate-950 p-2.5 rounded-lg border border-slate-800/80 break-all select-all">
-                http://localhost:8080/api/webhook/payment
+              <code class="block text-xs font-mono text-zinc-300 bg-zinc-950 p-2 rounded border border-white/[0.04] break-all select-all">
+                POST /api/webhook/payment
               </code>
-              <p class="text-[11px] text-slate-400 leading-normal">
-                Accepts HTTP POST with raw notification text or JSON payload: <code class="text-slate-300">{"text": "Paid Rs 250 to Subway..."}</code>
+              <p class="text-[10px] font-mono text-zinc-500">
+                Payload Schema: <span class="text-zinc-400">{"text": "raw notification string"}</span>
               </p>
             </div>
 
             <!-- Steps for Android & iOS -->
-            <div class="space-y-3">
+            <div class="space-y-2 font-mono text-xs">
               
-              <!-- Android Setup -->
-              <div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-xs space-y-1.5">
-                <div class="font-bold text-slate-200 flex items-center gap-1.5">
-                  <span class="text-emerald-400">🤖</span> Android (MacroDroid or Tasker - 2 Min Setup):
+              <div class="p-2.5 rounded bg-zinc-900/40 border border-white/[0.04] space-y-1">
+                <div class="font-semibold text-zinc-300 text-[11px] flex items-center gap-1.5">
+                  <span class="text-emerald-400">#</span> Android Integration (MacroDroid / Tasker):
                 </div>
-                <ol class="list-decimal list-inside text-slate-400 space-y-1 pl-1">
-                  <li>Install free <strong class="text-slate-200">MacroDroid</strong> or <strong class="text-slate-200">Tasker</strong> from Google Play Store.</li>
-                  <li>Set <strong class="text-indigo-400">Trigger</strong>: <em>Notification Received</em> &rarr; Select <strong class="text-slate-200">Google Pay, PhonePe, Paytm</strong> or SMS app.</li>
-                  <li>Set <strong class="text-emerald-400">Action</strong>: <em>HTTP Request</em> (Method: POST, URL: your webhook, Body: <code class="text-slate-300">{"text": "[not_text]"}</code>).</li>
-                </ol>
-                <div class="text-[11px] text-emerald-400/90 pt-1">
-                  &bull; <em>Result:</em> Every single time you pay at a store or tap UPI, it logs into TraceEx within 500ms!
+                <div class="text-[11px] text-zinc-400 leading-normal pl-3">
+                  1. Trigger: <span class="text-zinc-200">Notification Received</span> (Select Google Pay, PhonePe, Paytm, or SMS).<br>
+                  2. Action: <span class="text-zinc-200">HTTP POST</span> to webhook endpoint with body <code class="text-zinc-300">{"text": "{not_text}"}</code>.
                 </div>
               </div>
 
-              <!-- iOS Setup -->
-              <div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-xs space-y-1.5">
-                <div class="font-bold text-slate-200 flex items-center gap-1.5">
-                  <span class="text-indigo-400">🍏</span> iOS (Apple Shortcuts Automation):
+              <div class="p-2.5 rounded bg-zinc-900/40 border border-white/[0.04] space-y-1">
+                <div class="font-semibold text-zinc-300 text-[11px] flex items-center gap-1.5">
+                  <span class="text-indigo-400">#</span> iOS Integration (Shortcuts Automation):
                 </div>
-                <ol class="list-decimal list-inside text-slate-400 space-y-1 pl-1">
-                  <li>Open the built-in <strong class="text-slate-200">Shortcuts</strong> app on your iPhone &rarr; tap <strong>Automation</strong>.</li>
-                  <li>Choose <em>"When I receive a message from Bank"</em> or <em>"Transaction"</em>.</li>
-                  <li>Add Action: <strong class="text-slate-200">Get Contents of URL</strong> (POST to your TraceEx Webhook).</li>
-                </ol>
-              </div>
-
-              <!-- Open Banking Note -->
-              <div class="p-3 rounded-lg bg-slate-900/40 border border-slate-800/60 text-[11px] text-slate-400">
-                <strong class="text-slate-300">🏦 Production Open Banking / Account Aggregators:</strong><br>
-                For direct bank-to-bank API sync without notifications, enterprise apps use regulated Account Aggregators (like <strong class="text-slate-200">RBI-licensed Setu / Finvu</strong> in India or <strong class="text-slate-200">Plaid / Salt Edge</strong> in US/Europe) via approved developer credentials.
+                <div class="text-[11px] text-zinc-400 leading-normal pl-3">
+                  Trigger on bank transaction notification &rarr; Action: <span class="text-zinc-200">Get Contents of URL</span>.
+                </div>
               </div>
 
             </div>
@@ -564,14 +546,14 @@
     </section>
 
     <!-- ================= TAB 4: ANALYTICS & REPORTS ================= -->
-    <section data-tab-content="analytics" class="space-y-6 hidden">
+    <section data-tab-content="analytics" class="space-y-5 hidden motion-tab-pane">
       
       <!-- Daily Spending Burn Rate Chart -->
-      <div class="glass-card p-6">
-        <div class="flex items-center justify-between mb-4">
+      <div class="bento-card p-5">
+        <div class="flex items-center justify-between mb-3 border-b border-white/[0.08] pb-3">
           <div>
-            <h3 class="text-base font-bold text-slate-100">Daily Spending Velocity</h3>
-            <p class="text-xs text-slate-400">Expenditure pattern day-by-day across the selected month</p>
+            <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200">Daily Spending Burn Velocity</h3>
+            <p class="text-[11px] text-zinc-500 font-mono">Day-by-day cash burn across current billing cycle</p>
           </div>
         </div>
         <div class="h-64 sm:h-72 w-full">
@@ -580,23 +562,23 @@
       </div>
 
       <!-- Payment Methods & Top Expenses Leaderboard -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         
         <!-- Payment Methods Chart -->
-        <div class="glass-card p-6">
-          <h3 class="text-base font-bold text-slate-100 mb-1">Spend by Payment Channel</h3>
-          <p class="text-xs text-slate-400 mb-4">Distribution across cards, UPI, cash & bank transfers</p>
+        <div class="bento-card p-5">
+          <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200 mb-1">Channel Dispersion</h3>
+          <p class="text-[11px] text-zinc-500 font-mono mb-4">Volume by card, UPI, wire & cash</p>
           <div class="h-60 w-full">
             <canvas id="payment-methods-chart"></canvas>
           </div>
         </div>
 
         <!-- Top 5 Expenses Leaderboard -->
-        <div class="glass-card p-6 flex flex-col justify-between">
+        <div class="bento-card p-5 flex flex-col justify-between">
           <div>
-            <h3 class="text-base font-bold text-slate-100 mb-1">Top Expenses of the Month</h3>
-            <p class="text-xs text-slate-400 mb-4">Your largest single financial outflows</p>
-            <div id="top-expenses-list" class="space-y-3">
+            <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200 mb-1">Peak Outflow Events</h3>
+            <p class="text-[11px] text-zinc-500 font-mono mb-4">Largest single debits this cycle</p>
+            <div id="top-expenses-list" class="space-y-2">
               <!-- Populated by JS -->
             </div>
           </div>
@@ -607,67 +589,68 @@
     </section>
 
     <!-- ================= TAB 5: SETTINGS & TOOLS ================= -->
-    <section data-tab-content="settings" class="space-y-6 hidden">
+    <section data-tab-content="settings" class="space-y-5 hidden motion-tab-pane">
       
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         
         <!-- Data Management -->
-        <div class="glass-card p-6">
-          <h3 class="text-lg font-bold text-slate-100 mb-2 flex items-center gap-2">
-            <span>💾</span> Data & Database Operations
-          </h3>
-          <p class="text-xs text-slate-400 mb-6">Manage persistence, restore realistic demo data, or clear local database records.</p>
+        <div class="bento-card p-5 space-y-4">
+          <div class="border-b border-white/[0.08] pb-3">
+            <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200">Database & State Control</h3>
+            <p class="text-[11px] text-zinc-500 font-mono">Persistent JSON and local memory management</p>
+          </div>
           
-          <div class="space-y-4">
-            <div class="flex items-center justify-between p-3 rounded-lg bg-slate-900/60 border border-slate-800">
+          <div class="space-y-3 font-mono text-xs">
+            <div class="flex items-center justify-between p-3 rounded bg-zinc-900 border border-white/[0.08]">
               <div>
-                <div class="text-sm font-semibold text-slate-200">Load Realistic Demo Data</div>
-                <div class="text-xs text-slate-400">Populate TraceEx with multi-month transactions, budgets, and goals</div>
+                <div class="font-medium text-zinc-200">Seed Demo Dataset</div>
+                <div class="text-[11px] text-zinc-500">Populate realistic test data</div>
               </div>
-              <button id="btn-reload-demo" class="px-3.5 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 font-semibold text-xs transition border border-indigo-500/40">
-                Restore Demo
+              <button id="btn-reload-demo" class="px-3 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs border border-white/[0.08] transition">
+                Reset Seed
               </button>
             </div>
 
-            <div class="flex items-center justify-between p-3 rounded-lg bg-slate-900/60 border border-slate-800">
+            <div class="flex items-center justify-between p-3 rounded bg-zinc-900 border border-white/[0.08]">
               <div>
-                <div class="text-sm font-semibold text-slate-200">Export Raw Transactions CSV</div>
-                <div class="text-xs text-slate-400">Download formatted CSV file compatible with Excel & Google Sheets</div>
+                <div class="font-medium text-zinc-200">Export Ledger (CSV)</div>
+                <div class="text-[11px] text-zinc-500">Structured tabular dump</div>
               </div>
-              <button onclick="API.triggerCsvDownload()" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition border border-slate-700">
-                Download CSV
+              <button onclick="API.triggerCsvDownload()" class="px-3 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs border border-white/[0.08] transition">
+                Export
               </button>
             </div>
 
-            <div class="flex items-center justify-between p-3 rounded-lg bg-rose-950/20 border border-rose-900/40">
+            <div class="flex items-center justify-between p-3 rounded bg-zinc-900 border border-rose-500/20">
               <div>
-                <div class="text-sm font-semibold text-rose-300">Wipe All Records</div>
-                <div class="text-xs text-rose-400/80">Completely clears all transactions, budgets, and goals</div>
+                <div class="font-medium text-rose-400">Purge Database</div>
+                <div class="text-[11px] text-zinc-500">Irrevocably erase all entries</div>
               </div>
-              <button id="btn-clear-data" class="px-3.5 py-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white font-semibold text-xs transition border border-rose-500/30">
-                Clear All
+              <button id="btn-clear-data" class="px-3 py-1 rounded bg-rose-500/10 hover:bg-rose-500 text-rose-300 hover:text-white text-xs border border-rose-500/30 transition">
+                Purge
               </button>
             </div>
           </div>
         </div>
 
         <!-- Financial Statement & Report Generator -->
-        <div class="glass-card p-6 flex flex-col justify-between">
+        <div class="bento-card p-5 flex flex-col justify-between">
           <div>
-            <h3 class="text-lg font-bold text-slate-100 mb-2 flex items-center gap-2">
-              <span>🖨️</span> Financial Statement Report
-            </h3>
-            <p class="text-xs text-slate-400 mb-6">Generate an executive print-ready financial statement and export to PDF.</p>
+            <div class="border-b border-white/[0.08] pb-3 mb-4">
+              <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-zinc-200">Audit & Statement Output</h3>
+              <p class="text-[11px] text-zinc-500 font-mono">Generate clean financial report</p>
+            </div>
             
-            <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2 mb-4">
-              <div class="text-xs text-slate-400">Total Net Worth Tracked</div>
-              <div id="metric-networth" class="text-2xl font-bold font-mono-num text-indigo-400">$0.00</div>
-              <div class="text-[11px] text-slate-500">Includes all historic recorded revenues minus expenses.</div>
+            <div class="p-4 rounded-md bg-zinc-900 border border-white/[0.08] space-y-1 mb-4">
+              <div class="text-[11px] font-mono text-zinc-500">CUMULATIVE LIQUID POSITION</div>
+              <div id="metric-networth" class="text-2xl font-bold font-mono-num text-white">$0.00</div>
+              <div class="text-[10px] font-mono text-zinc-600">All historic recorded revenues less debits.</div>
             </div>
           </div>
 
-          <button id="btn-print-report" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-            <span>📄</span> Print / Save Monthly Statement (PDF)
+          <button id="btn-print-report" class="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-mono text-xs font-medium rounded-md border border-white/[0.12] transition active:scale-95 flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <span>Print Financial Statement (PDF)</span>
           </button>
         </div>
 
@@ -680,39 +663,41 @@
   <!-- ================= MODALS ================= -->
 
   <!-- 1. Transaction Add/Edit Modal -->
-  <div id="tx-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
-    <div class="glass-card bg-slate-900 border-slate-700 max-w-lg w-full p-6 animate-pop-in">
-      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
-        <h3 id="tx-modal-title" class="text-lg font-bold text-white">Add New Transaction</h3>
-        <button onclick="App.closeTransactionModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+  <div id="tx-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 dialog-overlay hidden">
+    <div class="bento-card bg-zinc-950 border-white/[0.12] max-w-lg w-full p-6 motion-spring-in">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-white/[0.08]">
+        <h3 id="tx-modal-title" class="text-sm font-semibold font-mono uppercase tracking-wider text-white">Record Transaction</h3>
+        <button onclick="App.closeTransactionModal()" class="text-zinc-500 hover:text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
 
-      <form id="tx-form" class="space-y-4">
+      <form id="tx-form" class="space-y-4 font-mono text-xs">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Title / Merchant *</label>
-          <input id="tx-title" type="text" required placeholder="e.g. Grocery Store, Client Payment" 
-                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-zinc-400 mb-1">ENTITY / MERCHANT *</label>
+          <input id="tx-title" type="text" required placeholder="e.g. AWS Cloud, Client Retainer, Terminal Coffee" 
+                 class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white focus:outline-none focus:border-zinc-500">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Amount *</label>
+            <label class="block text-zinc-400 mb-1">MAGNITUDE *</label>
             <input id="tx-amount" type="number" step="0.01" min="0.01" required placeholder="0.00" 
-                   class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono-num focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                   class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white font-mono-num focus:outline-none focus:border-zinc-500">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Type *</label>
-            <select id="tx-type" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="EXPENSE">Expense (-)</option>
-              <option value="INCOME">Income (+)</option>
+            <label class="block text-zinc-400 mb-1">FLOW DIRECTION *</label>
+            <select id="tx-type" class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white focus:outline-none focus:border-zinc-500">
+              <option value="EXPENSE">Outflow (-)</option>
+              <option value="INCOME">Inflow (+)</option>
             </select>
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Category</label>
-            <select id="tx-category" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <label class="block text-zinc-400 mb-1">CATEGORY</label>
+            <select id="tx-category" class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white focus:outline-none focus:border-zinc-500">
               <option value="Food & Dining">Food & Dining</option>
               <option value="Housing & Rent">Housing & Rent</option>
               <option value="Transportation">Transportation</option>
@@ -727,16 +712,16 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Date *</label>
+            <label class="block text-zinc-400 mb-1">TIMESTAMP *</label>
             <input id="tx-date" type="date" required 
-                   class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                   class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white focus:outline-none focus:border-zinc-500">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Payment Method</label>
-            <select id="tx-payment" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <label class="block text-zinc-400 mb-1">SETTLEMENT CHANNEL</label>
+            <select id="tx-payment" class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white focus:outline-none focus:border-zinc-500">
               <option value="Credit Card">Credit Card</option>
               <option value="Debit Card">Debit Card</option>
               <option value="UPI">UPI</option>
@@ -746,39 +731,41 @@
             </select>
           </div>
           <div class="flex items-center pt-5">
-            <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-300">
-              <input id="tx-recurring" type="checkbox" class="w-4 h-4 rounded text-indigo-600 bg-slate-800 border-slate-700 focus:ring-indigo-500">
-              <span>Recurring Bill / Inflow</span>
+            <label class="inline-flex items-center gap-2 cursor-pointer text-zinc-300">
+              <input id="tx-recurring" type="checkbox" class="w-3.5 h-3.5 rounded bg-zinc-900 border-white/[0.12] text-zinc-100 focus:ring-0">
+              <span>Recurring Schedule</span>
             </label>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Notes / Tags</label>
-          <input id="tx-notes" type="text" placeholder="Optional details, receipt link, or tags" 
-                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-zinc-400 mb-1">NOTES / AUDIT TRAIL</label>
+          <input id="tx-notes" type="text" placeholder="Internal tracking metadata" 
+                 class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white focus:outline-none focus:border-zinc-500">
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-          <button type="button" onclick="App.closeTransactionModal()" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-sm font-semibold hover:bg-slate-700 transition">Cancel</button>
-          <button type="submit" class="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition">Save Transaction</button>
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/[0.08]">
+          <button type="button" onclick="App.closeTransactionModal()" class="px-3.5 py-1.5 rounded-md bg-zinc-900 text-zinc-400 hover:text-white transition">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 rounded-md bg-white text-zinc-950 font-medium hover:bg-zinc-200 transition active:scale-95">Save Entry</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- 2. Budget Modal -->
-  <div id="budget-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
-    <div class="glass-card bg-slate-900 border-slate-700 max-w-md w-full p-6 animate-pop-in">
-      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
-        <h3 class="text-lg font-bold text-white">Set Category Budget Limit</h3>
-        <button onclick="App.closeBudgetModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+  <div id="budget-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 dialog-overlay hidden">
+    <div class="bento-card bg-zinc-950 border-white/[0.12] max-w-sm w-full p-5 motion-spring-in">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-white/[0.08]">
+        <h3 class="text-sm font-semibold font-mono uppercase tracking-wider text-white">Define Category Cap</h3>
+        <button onclick="App.closeBudgetModal()" class="text-zinc-500 hover:text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
 
-      <form id="budget-form" class="space-y-4">
+      <form id="budget-form" class="space-y-4 font-mono text-xs">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Category</label>
-          <select id="budget-category" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-zinc-400 mb-1">TARGET CATEGORY</label>
+          <select id="budget-category" class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white focus:outline-none focus:border-zinc-500">
             <option value="Food & Dining">Food & Dining</option>
             <option value="Housing & Rent">Housing & Rent</option>
             <option value="Transportation">Transportation</option>
@@ -791,182 +778,173 @@
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Monthly Spending Cap</label>
+          <label class="block text-zinc-400 mb-1">MONTHLY CAP THRESHOLD</label>
           <input id="budget-limit" type="number" step="1" min="1" required placeholder="500" 
-                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono-num focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                 class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white font-mono-num focus:outline-none focus:border-zinc-500">
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-          <button type="button" onclick="App.closeBudgetModal()" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-sm font-semibold hover:bg-slate-700 transition">Cancel</button>
-          <button type="submit" class="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition">Save Budget</button>
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/[0.08]">
+          <button type="button" onclick="App.closeBudgetModal()" class="px-3 py-1.5 rounded-md bg-zinc-900 text-zinc-400 hover:text-white transition">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 rounded-md bg-white text-zinc-950 font-medium hover:bg-zinc-200 transition active:scale-95">Set Cap</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- 3. Goal Modal -->
-  <div id="goal-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
-    <div class="glass-card bg-slate-900 border-slate-700 max-w-md w-full p-6 animate-pop-in">
-      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
-        <h3 class="text-lg font-bold text-white">Create Savings Goal</h3>
-        <button onclick="App.closeGoalModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+  <div id="goal-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 dialog-overlay hidden">
+    <div class="bento-card bg-zinc-950 border-white/[0.12] max-w-sm w-full p-5 motion-spring-in">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-white/[0.08]">
+        <h3 class="text-sm font-semibold font-mono uppercase tracking-wider text-white">New Milestone Target</h3>
+        <button onclick="App.closeGoalModal()" class="text-zinc-500 hover:text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
 
-      <form id="goal-form" class="space-y-4">
+      <form id="goal-form" class="space-y-4 font-mono text-xs">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Goal Name *</label>
-          <input id="goal-name" type="text" required placeholder="e.g. Dream Vacation, New Vehicle, Emergency Fund" 
-                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-zinc-400 mb-1">TARGET IDENTIFIER *</label>
+          <input id="goal-name" type="text" required placeholder="e.g. Server Infrastructure, Operating Reserve" 
+                 class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white focus:outline-none focus:border-zinc-500">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Target Amount *</label>
+            <label class="block text-zinc-400 mb-1">TARGET QUANTITY *</label>
             <input id="goal-target" type="number" step="1" min="1" required placeholder="5000" 
-                   class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono-num focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                   class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white font-mono-num focus:outline-none focus:border-zinc-500">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Initial Saved Amount</label>
+            <label class="block text-zinc-400 mb-1">INITIAL RESERVE</label>
             <input id="goal-current" type="number" step="1" min="0" placeholder="0" 
-                   class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono-num focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Target Deadline</label>
-            <input id="goal-deadline" type="date" 
-                   class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Category</label>
-            <select id="goal-category" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="Savings">General Savings</option>
-              <option value="Safety">Emergency Fund</option>
-              <option value="Travel">Vacation & Travel</option>
-              <option value="Technology">Tech & Electronics</option>
-              <option value="Vehicle">Vehicle</option>
-              <option value="Home">Home & Property</option>
-            </select>
+                   class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white font-mono-num focus:outline-none focus:border-zinc-500">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Notes</label>
-          <input id="goal-notes" type="text" placeholder="Why you're saving for this" 
-                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-zinc-400 mb-1">TARGET DATE</label>
+          <input id="goal-deadline" type="date" 
+                 class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white focus:outline-none focus:border-zinc-500">
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-          <button type="button" onclick="App.closeGoalModal()" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-sm font-semibold hover:bg-slate-700 transition">Cancel</button>
-          <button type="submit" class="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition">Create Goal</button>
+        <input type="hidden" id="goal-category" value="Savings">
+        <input type="hidden" id="goal-notes" value="Milestone Reserve">
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/[0.08]">
+          <button type="button" onclick="App.closeGoalModal()" class="px-3 py-1.5 rounded-md bg-zinc-900 text-zinc-400 hover:text-white transition">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 rounded-md bg-white text-zinc-950 font-medium hover:bg-zinc-200 transition active:scale-95">Create Target</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- 4. Add Funds to Goal Modal -->
-  <div id="funds-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
-    <div class="glass-card bg-slate-900 border-slate-700 max-w-sm w-full p-6 animate-pop-in">
-      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
-        <h3 class="text-base font-bold text-white">Add Funds</h3>
-        <button onclick="App.closeFundsModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+  <!-- 4. Add Funds Modal -->
+  <div id="funds-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 dialog-overlay hidden">
+    <div class="bento-card bg-zinc-950 border-white/[0.12] max-w-xs w-full p-5 motion-spring-in">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/[0.08]">
+        <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-white">Allocate Capital</h3>
+        <button onclick="App.closeFundsModal()" class="text-zinc-500 hover:text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
 
-      <div class="mb-4">
-        <div class="text-xs text-slate-400">Contributing to:</div>
-        <div id="funds-goal-name" class="text-sm font-bold text-indigo-400">Goal Name</div>
+      <div class="mb-3 font-mono text-xs">
+        <div class="text-zinc-500 text-[10px]">TARGET</div>
+        <div id="funds-goal-name" class="font-semibold text-zinc-200 truncate">Target</div>
       </div>
 
-      <form onsubmit="App.handleAddFundsSubmit(event)" class="space-y-4">
+      <form onsubmit="App.handleAddFundsSubmit(event)" class="space-y-3 font-mono text-xs">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Contribution Amount *</label>
+          <label class="block text-zinc-400 mb-1">CONTRIBUTION AMOUNT *</label>
           <input id="funds-amount" type="number" step="0.01" min="0.01" required placeholder="100.00" 
-                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono-num focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                 class="w-full bg-zinc-900 border border-white/[0.08] rounded-md px-3 py-2 text-white font-mono-num focus:outline-none focus:border-zinc-500">
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-          <button type="button" onclick="App.closeFundsModal()" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-sm font-semibold hover:bg-slate-700 transition">Cancel</button>
-          <button type="submit" class="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition">+ Add Funds</button>
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-white/[0.08]">
+          <button type="button" onclick="App.closeFundsModal()" class="px-3 py-1.5 rounded-md bg-zinc-900 text-zinc-400 hover:text-white transition">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 rounded-md bg-white text-zinc-950 font-medium hover:bg-zinc-200 transition active:scale-95">Confirm</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- 5. Digital Receipt Modal -->
-  <div id="receipt-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
-    <div class="bg-white text-slate-900 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-pop-in">
-      <div class="text-center pb-4 border-b border-dashed border-slate-300">
-        <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto mb-2 text-lg font-bold">✓</div>
-        <h4 class="font-bold text-lg tracking-tight">TraceEx Receipt</h4>
-        <div class="text-[11px] text-slate-500 font-mono" id="receipt-id">TX-12345678</div>
+  <div id="receipt-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 dialog-overlay hidden">
+    <div class="bg-zinc-950 border border-white/[0.12] rounded-lg max-w-sm w-full p-6 shadow-2xl motion-spring-in font-mono text-xs">
+      <div class="text-center pb-3 border-b border-white/[0.08]">
+        <div class="text-[10px] text-zinc-500">TRANSACTION SLIP</div>
+        <h4 class="font-bold text-white text-sm tracking-tight mt-0.5">TraceEx Record</h4>
+        <div class="text-[10px] text-zinc-500 mt-1" id="receipt-id">TX-00000000</div>
       </div>
 
-      <div class="py-4 space-y-3 text-sm">
+      <div class="py-3.5 space-y-2.5">
         <div class="flex justify-between">
-          <span class="text-slate-500">Merchant / Item</span>
-          <span class="font-bold text-slate-800" id="receipt-title">Grocery</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-500">Category</span>
-          <span class="font-medium text-slate-800" id="receipt-category">Food</span>
+          <span class="text-zinc-500">Entity</span>
+          <span class="font-medium text-zinc-200" id="receipt-title">-</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-slate-500">Date</span>
-          <span class="font-medium text-slate-800 font-mono-num" id="receipt-date">2026-10-15</span>
+          <span class="text-zinc-500">Category</span>
+          <span class="font-medium text-zinc-200" id="receipt-category">-</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-slate-500">Payment Channel</span>
-          <span class="font-medium text-slate-800" id="receipt-payment">UPI</span>
+          <span class="text-zinc-500">Timestamp</span>
+          <span class="font-medium text-zinc-200 font-mono-num" id="receipt-date">-</span>
         </div>
-        <div class="flex justify-between pt-2 border-t border-dashed border-slate-300">
-          <span class="font-bold text-slate-800">Total Amount</span>
-          <span class="font-extrabold text-indigo-600 text-base font-mono-num" id="receipt-amount">$0.00</span>
+        <div class="flex justify-between">
+          <span class="text-zinc-500">Channel</span>
+          <span class="font-medium text-zinc-200" id="receipt-payment">-</span>
         </div>
-        <div class="text-[11px] text-slate-500 italic pt-1" id="receipt-notes">Notes</div>
+        <div class="flex justify-between pt-2 border-t border-white/[0.08]">
+          <span class="text-zinc-400">Total Magnitude</span>
+          <span class="font-bold text-white font-mono-num" id="receipt-amount">$0.00</span>
+        </div>
+        <div class="text-[10px] text-zinc-500 italic pt-1 truncate" id="receipt-notes">Notes</div>
       </div>
 
-      <div class="pt-4 border-t border-dashed border-slate-300 flex items-center gap-2">
-        <button onclick="window.print()" class="flex-1 py-2 rounded-lg bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-700 transition">Print Receipt</button>
+      <div class="pt-3 border-t border-white/[0.08] flex items-center gap-2">
+        <button onclick="window.print()" class="flex-1 py-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium transition text-xs">Print Slip</button>
+        <button onclick="App.closeReceiptModal()" class="py-1.5 px-4 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-400 transition text-xs">Close</button>
       </div>
     </div>
   </div>
 
   <!-- 6. Mobile Live Sync Quick Modal -->
-  <div id="mobile-sync-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
-    <div class="glass-card bg-slate-900 border-slate-700 max-w-lg w-full p-6 animate-pop-in space-y-4">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+  <div id="mobile-sync-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 dialog-overlay hidden">
+    <div class="bento-card bg-zinc-950 border-white/[0.12] max-w-lg w-full p-5 motion-spring-in space-y-3 font-mono text-xs">
+      <div class="flex items-center justify-between pb-3 border-b border-white/[0.08]">
         <div class="flex items-center gap-2">
-          <span class="text-xl">📱</span>
-          <h3 class="text-base font-bold text-white">Live Mobile Payment & SMS Parser</h3>
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-white">Payment Webhook & SMS Parser</h3>
         </div>
-        <button onclick="App.closeMobileSyncModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+        <button onclick="App.closeMobileSyncModal()" class="text-zinc-500 hover:text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
 
       <div>
-        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Quick Test Real Alerts:</div>
+        <div class="text-[10px] text-zinc-500 uppercase tracking-wider mb-1.5">Preset Mock Ingest:</div>
         <div class="flex flex-wrap gap-1.5">
-          <button onclick="App.loadSampleSms('swiggy')" class="px-2 py-0.5 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">🍔 Swiggy</button>
-          <button onclick="App.loadSampleSms('starbucks')" class="px-2 py-0.5 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">☕ Starbucks</button>
-          <button onclick="App.loadSampleSms('shell')" class="px-2 py-0.5 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">⛽ Shell</button>
-          <button onclick="App.loadSampleSms('salary')" class="px-2 py-0.5 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">💵 Salary</button>
+          <button onclick="App.loadSampleSms('swiggy')" class="px-2 py-0.5 text-[11px] rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/[0.08] transition">swiggy</button>
+          <button onclick="App.loadSampleSms('starbucks')" class="px-2 py-0.5 text-[11px] rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/[0.08] transition">starbucks</button>
+          <button onclick="App.loadSampleSms('shell')" class="px-2 py-0.5 text-[11px] rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/[0.08] transition">shell</button>
+          <button onclick="App.loadSampleSms('salary')" class="px-2 py-0.5 text-[11px] rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/[0.08] transition">salary</button>
         </div>
       </div>
 
       <div>
-        <label class="block text-xs font-semibold text-slate-300 mb-1">Paste SMS / Notification from GPay, PhonePe, Paytm, Bank:</label>
+        <label class="block text-zinc-400 text-[11px] mb-1">RAW NOTIFICATION STRING:</label>
         <textarea id="sms-modal-input" rows="3" placeholder="e.g. Paid Rs 350 to Starbucks on UPI..." 
-                  class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-xs"></textarea>
+                  class="w-full bg-zinc-900 border border-white/[0.08] rounded-md p-2.5 text-xs text-white focus:outline-none focus:border-zinc-500"></textarea>
       </div>
 
-      <div class="flex items-center justify-between pt-2 border-t border-slate-800">
-        <a href="javascript:void(0)" onclick="App.closeMobileSyncModal(); App.switchTab('mobile-sync');" class="text-xs text-indigo-400 hover:underline">
-          View Full Mobile Automation Setup →
+      <div class="flex items-center justify-between pt-2 border-t border-white/[0.08]">
+        <a href="javascript:void(0)" onclick="App.closeMobileSyncModal(); App.switchTab('mobile-sync');" class="text-zinc-500 hover:text-zinc-300 underline text-[11px]">
+          Full Webhook Documentation →
         </a>
         <div class="flex gap-2">
-          <button onclick="App.closeMobileSyncModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 transition">Close</button>
-          <button onclick="const val = document.getElementById('sms-modal-input').value; App.closeMobileSyncModal(); App.switchTab('mobile-sync'); document.getElementById('sms-input-text').value = val; App.parseSmsLive();" class="px-4 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-500 transition">
-            ⚡ Parse & Add
+          <button onclick="App.closeMobileSyncModal()" class="px-3 py-1 rounded bg-zinc-900 text-zinc-400 hover:text-white transition">Cancel</button>
+          <button onclick="const val = document.getElementById('sms-modal-input').value; App.closeMobileSyncModal(); App.switchTab('mobile-sync'); document.getElementById('sms-input-text').value = val; App.parseSmsLive();" class="px-3.5 py-1 rounded bg-white text-zinc-950 font-medium hover:bg-zinc-200 transition active:scale-95">
+            Parse & Ingest
           </button>
         </div>
       </div>

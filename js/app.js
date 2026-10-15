@@ -154,14 +154,22 @@ const App = {
     this.state.activeTab = tabId;
     document.querySelectorAll('[data-tab-target]').forEach(btn => {
       const isActive = btn.getAttribute('data-tab-target') === tabId;
-      btn.classList.toggle('bg-indigo-600', isActive);
+      btn.classList.toggle('bg-zinc-800', isActive);
       btn.classList.toggle('text-white', isActive);
-      btn.classList.toggle('text-slate-400', !isActive);
-      btn.classList.toggle('hover:bg-slate-800', !isActive);
+      btn.classList.toggle('shadow-sm', isActive);
+      btn.classList.toggle('border-zinc-700/60', isActive);
+      btn.classList.toggle('text-zinc-400', !isActive);
+      btn.classList.toggle('hover:text-zinc-200', !isActive);
     });
 
     document.querySelectorAll('[data-tab-content]').forEach(view => {
-      view.classList.toggle('hidden', view.getAttribute('data-tab-content') !== tabId);
+      const isTarget = view.getAttribute('data-tab-content') === tabId;
+      view.classList.toggle('hidden', !isTarget);
+      if (isTarget) {
+        view.classList.remove('motion-tab-pane');
+        void view.offsetWidth; // trigger reflow for smooth motion animation
+        view.classList.add('motion-tab-pane');
+      }
     });
 
     if (tabId === 'transactions') {
@@ -276,7 +284,7 @@ const App = {
 
     const reports = summary.budgetReports || [];
     if (reports.length === 0) {
-      container.innerHTML = `<div class="text-sm text-slate-400 text-center py-4">No active budgets set for this month. <a href="javascript:void(0)" onclick="App.openBudgetModal()" class="text-indigo-400 hover:underline">Set a budget</a></div>`;
+      container.innerHTML = `<div class="text-xs font-mono text-zinc-500 text-center py-4">No active ceiling caps configured.</div>`;
       return;
     }
 
@@ -293,15 +301,22 @@ const App = {
       }
 
       html += `
-        <div class="space-y-1.5 pb-2 border-b border-slate-700/40 last:border-0">
-          <div class="flex items-center justify-between text-xs">
-            <span class="font-semibold text-slate-200">${this.escapeHtml(b.category)}</span>
-            <span class="px-2 py-0.5 rounded-full border text-[10px] font-bold ${badgeClass}">
-              ${b.percent}% (${this.state.currency}${b.spent.toLocaleString()} / ${this.state.currency}${b.limitAmount.toLocaleString()})
+        <div class="space-y-1.5 pb-2 border-b border-white/[0.04] last:border-0 font-mono text-xs">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 text-zinc-300">
+              ${this.getCategoryDot(b.category)}
+              <span class="font-medium text-xs">${this.escapeHtml(b.category)}</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.2 rounded border font-mono ${badgeClass}">
+              ${b.percent}%
             </span>
           </div>
-          <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+          <div class="w-full bg-zinc-800 rounded-full h-1 overflow-hidden">
             <div class="${colorClass} h-full transition-all duration-300" style="width: ${Math.min(100, b.percent)}%"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-zinc-500">
+            <span>Spent: ${this.state.currency}${b.spent.toLocaleString()}</span>
+            <span>Cap: ${this.state.currency}${b.limitAmount.toLocaleString()}</span>
           </div>
         </div>
       `;
@@ -323,27 +338,32 @@ const App = {
     txs.forEach(t => {
       const isIncome = t.type === 'INCOME';
       const sign = isIncome ? '+' : '-';
-      const color = isIncome ? 'text-emerald-400' : 'text-slate-100';
-      const icon = isIncome ? '💰' : this.getCategoryIcon(t.category);
+      const color = isIncome ? 'text-emerald-400' : 'text-zinc-200';
 
       html += `
-        <div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-800/40 transition border border-transparent hover:border-slate-700/50">
+        <div class="flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-800/40 transition border border-transparent hover:border-zinc-800">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-800/80 text-lg border border-slate-700/50">
-              ${icon}
+            <div class="w-7 h-7 rounded-md flex items-center justify-center ${isIncome ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-zinc-800/80 text-zinc-400 border border-zinc-700/60'}">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                ${isIncome 
+                  ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V8H8" />' 
+                  : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 7l-9.2 9.2M7 7v9h9" />}
+              </svg>
             </div>
             <div>
-              <div class="font-medium text-slate-100 text-sm">${this.escapeHtml(t.title)}</div>
-              <div class="text-xs text-slate-400 flex items-center gap-2">
+              <div class="font-medium text-zinc-100 text-xs sm:text-sm tracking-tight">${this.escapeHtml(t.title)}</div>
+              <div class="text-[11px] text-zinc-500 font-mono flex items-center gap-1.5 mt-0.5">
                 <span>${t.date}</span>
-                <span>•</span>
-                <span class="text-indigo-400">${this.escapeHtml(t.paymentMethod)}</span>
+                <span>/</span>
+                <span class="text-zinc-400">${this.escapeHtml(t.category)}</span>
+                <span>/</span>
+                <span class="text-zinc-500">${this.escapeHtml(t.paymentMethod)}</span>
               </div>
             </div>
           </div>
           <div class="text-right">
-            <div class="font-mono-num font-bold text-sm ${color}">${sign}${this.state.currency}${t.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
-            <button onclick="App.viewReceipt('${t.id}')" class="text-[11px] text-slate-400 hover:text-indigo-400 underline">Receipt</button>
+            <div class="font-mono-num font-semibold text-xs sm:text-sm ${color}">${sign}${this.state.currency}${t.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+            <button onclick="App.viewReceipt('${t.id}')" class="text-[10px] font-mono text-zinc-500 hover:text-zinc-300 underline">receipt</button>
           </div>
         </div>
       `;
@@ -391,31 +411,38 @@ const App = {
         const catClass = this.getCategoryClass(t.category);
 
         html += `
-          <tr class="border-b border-slate-800/80 hover:bg-slate-800/30 transition text-sm">
-            <td class="py-3 px-4 text-slate-400 whitespace-nowrap font-mono-num text-xs">${t.date}</td>
-            <td class="py-3 px-4 font-semibold text-slate-100">
+          <tr class="border-b border-zinc-800/60 hover:bg-zinc-800/30 transition text-xs">
+            <td class="py-3 px-4 text-zinc-400 whitespace-nowrap font-mono text-[11px]">${t.date}</td>
+            <td class="py-3 px-4 font-medium text-zinc-100">
               <div class="flex items-center gap-2">
                 <span>${this.escapeHtml(t.title)}</span>
-                ${t.isRecurring ? '<span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded">Recurring</span>' : ''}
+                ${t.isRecurring ? '<span class="text-[9px] font-mono px-1.5 py-0.2 rounded border border-zinc-700 bg-zinc-800 text-zinc-400">REC</span>' : ''}
               </div>
-              ${t.notes ? `<div class="text-xs text-slate-400 font-normal mt-0.5 truncate max-w-xs">${this.escapeHtml(t.notes)}</div>` : ''}
+              ${t.notes ? `<div class="text-[11px] text-zinc-500 font-normal mt-0.5 truncate max-w-xs">${this.escapeHtml(t.notes)}</div>` : ''}
             </td>
             <td class="py-3 px-4">
-              <span class="cat-badge ${catClass}">
-                ${this.getCategoryIcon(t.category)} ${this.escapeHtml(t.category)}
+              <span class="badge-cat">
+                ${this.getCategoryDot(t.category)}
+                <span>${this.escapeHtml(t.category)}</span>
               </span>
             </td>
-            <td class="py-3 px-4 text-slate-300 text-xs">
-              <span class="bg-slate-800 px-2 py-1 rounded border border-slate-700/60 font-mono-num">${this.escapeHtml(t.paymentMethod)}</span>
+            <td class="py-3 px-4 text-zinc-400 text-xs">
+              <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-zinc-800/60 border border-zinc-700/40 text-zinc-300">${this.escapeHtml(t.paymentMethod)}</span>
             </td>
-            <td class="py-3 px-4 text-right font-mono-num font-bold ${amtColor} whitespace-nowrap">
+            <td class="py-3 px-4 text-right font-mono-num font-semibold ${amtColor} whitespace-nowrap">
               ${sign}${this.state.currency}${t.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </td>
             <td class="py-3 px-4 text-right whitespace-nowrap">
-              <div class="flex items-center justify-end gap-1.5">
-                <button onclick="App.viewReceipt('${t.id}')" title="View digital receipt" class="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded">🧾</button>
-                <button onclick="App.openTransactionModal('${t.id}')" title="Edit transaction" class="p-1.5 text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 rounded">✏️</button>
-                <button onclick="App.deleteTransaction('${t.id}')" title="Delete transaction" class="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded">🗑️</button>
+              <div class="flex items-center justify-end gap-1">
+                <button onclick="App.viewReceipt('${t.id}')" title="Receipt" class="p-1 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </button>
+                <button onclick="App.openTransactionModal('${t.id}')" title="Edit" class="p-1 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                </button>
+                <button onclick="App.deleteTransaction('${t.id}')" title="Delete" class="p-1 text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 rounded transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
               </div>
             </td>
           </tr>
@@ -559,26 +586,28 @@ const App = {
           }
 
           bHtml += `
-            <div class="glass-card p-5 relative overflow-hidden">
-              <div class="flex items-center justify-between mb-3">
+            <div class="bento-card p-4 relative overflow-hidden">
+              <div class="flex items-center justify-between mb-2.5">
                 <div class="flex items-center gap-2">
-                  <span class="text-xl">${this.getCategoryIcon(b.category)}</span>
-                  <span class="font-bold text-slate-100">${this.escapeHtml(b.category)}</span>
+                  ${this.getCategoryDot(b.category)}
+                  <span class="font-medium text-xs text-zinc-200">${this.escapeHtml(b.category)}</span>
                 </div>
-                <button onclick="App.deleteBudget('${b.id}')" title="Delete budget" class="text-xs text-slate-400 hover:text-rose-400">✕</button>
+                <button onclick="App.deleteBudget('${b.id}')" title="Delete budget" class="text-zinc-500 hover:text-zinc-300 p-0.5 rounded transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
               </div>
 
               <div class="flex items-baseline justify-between mb-2">
-                <span class="text-2xl font-bold font-mono-num ${textColor}">${this.state.currency}${b.spent.toLocaleString()}</span>
-                <span class="text-xs text-slate-400">Budget: ${this.state.currency}${b.limitAmount.toLocaleString()}</span>
+                <span class="text-xl font-bold font-mono-num ${textColor}">${this.state.currency}${b.spent.toLocaleString()}</span>
+                <span class="text-[11px] font-mono text-zinc-500">CAP: ${this.state.currency}${b.limitAmount.toLocaleString()}</span>
               </div>
 
-              <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden mb-2">
+              <div class="w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden mb-2">
                 <div class="${barColor} h-full transition-all duration-300" style="width: ${Math.min(100, b.percent)}%"></div>
               </div>
 
-              <div class="flex items-center justify-between text-xs text-slate-400 font-mono-num">
-                <span>${b.percent}% spent</span>
+              <div class="flex items-center justify-between text-[11px] text-zinc-400 font-mono">
+                <span>${b.percent}% utilized</span>
                 <span>${b.remaining >= 0 ? `${this.state.currency}${b.remaining.toLocaleString()} left` : `Exceeded by ${this.state.currency}${Math.abs(b.remaining).toLocaleString()}`}</span>
               </div>
             </div>
@@ -593,39 +622,41 @@ const App = {
     if (gContainer) {
       const goals = summary.goals || [];
       if (goals.length === 0) {
-        gContainer.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400">No savings goals set yet. Click "+ Add Goal" above!</div>`;
+        gContainer.innerHTML = `<div class="col-span-full py-8 text-center text-zinc-500 font-mono text-xs">No active targets defined.</div>`;
       } else {
         let gHtml = '';
         goals.forEach(g => {
           const isComplete = g.currentAmount >= g.targetAmount;
           gHtml += `
-            <div class="glass-card p-5 relative">
+            <div class="bento-card p-4 relative">
               <div class="flex items-start justify-between mb-2">
                 <div>
-                  <h4 class="font-bold text-slate-100 flex items-center gap-2">
-                    ${this.escapeHtml(g.name)}
-                    ${isComplete ? '<span class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">Achieved! 🎉</span>' : ''}
-                  </h4>
-                  <p class="text-xs text-slate-400">${this.escapeHtml(g.notes || g.category)}</p>
+                  <div class="font-medium text-zinc-100 text-xs sm:text-sm flex items-center gap-1.5">
+                    <span>${this.escapeHtml(g.name)}</span>
+                    ${isComplete ? '<span class="text-[9px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.2 rounded">FULFILLED</span>' : ''}
+                  </div>
+                  <p class="text-[11px] text-zinc-500 font-mono mt-0.5">${this.escapeHtml(g.notes || g.category)}</p>
                 </div>
-                <button onclick="App.deleteGoal('${g.id}')" title="Delete goal" class="text-xs text-slate-400 hover:text-rose-400">✕</button>
+                <button onclick="App.deleteGoal('${g.id}')" title="Delete target" class="text-zinc-500 hover:text-zinc-300 p-0.5 rounded transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
               </div>
 
               <div class="flex items-baseline justify-between mb-2">
                 <div>
-                  <span class="text-xl font-bold font-mono-num text-indigo-400">${this.state.currency}${g.currentAmount.toLocaleString()}</span>
-                  <span class="text-xs text-slate-400"> / ${this.state.currency}${g.targetAmount.toLocaleString()}</span>
+                  <span class="text-lg font-bold font-mono-num text-zinc-100">${this.state.currency}${g.currentAmount.toLocaleString()}</span>
+                  <span class="text-xs font-mono text-zinc-500"> / ${this.state.currency}${g.targetAmount.toLocaleString()}</span>
                 </div>
-                <span class="text-xs font-bold font-mono-num text-slate-300">${g.progressPercent}%</span>
+                <span class="text-xs font-mono font-medium text-zinc-400">${g.progressPercent}%</span>
               </div>
 
-              <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden mb-3">
+              <div class="w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden mb-2.5">
                 <div class="bg-indigo-500 h-full transition-all duration-300" style="width: ${Math.min(100, g.progressPercent)}%"></div>
               </div>
 
-              <div class="flex items-center justify-between text-xs pt-1">
-                <span class="text-slate-400">Target: ${g.deadline || 'No deadline'}</span>
-                <button onclick="App.openAddFundsModal('${g.id}', '${this.escapeHtml(g.name)}')" class="px-2.5 py-1 rounded bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 text-xs font-semibold transition">
+              <div class="flex items-center justify-between text-[11px] pt-1">
+                <span class="text-zinc-500 font-mono">${g.deadline ? 'Due ' + g.deadline : 'No date'}</span>
+                <button onclick="App.openAddFundsModal('${g.id}', '${this.escapeHtml(g.name)}')" class="px-2 py-0.5 rounded border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] font-mono transition">
                   + Add Funds
                 </button>
               </div>
@@ -771,20 +802,20 @@ const App = {
     if (topEl) {
       const topTxs = summary.topExpenses || [];
       if (topTxs.length === 0) {
-        topEl.innerHTML = `<div class="text-slate-400 text-sm">No expenses logged for this month yet.</div>`;
+        topEl.innerHTML = `<div class="text-zinc-500 font-mono text-xs">No debits logged for this cycle.</div>`;
       } else {
         let html = '';
         topTxs.forEach((t, idx) => {
           html += `
-            <div class="flex items-center justify-between py-2 border-b border-slate-700/40 last:border-0">
-              <div class="flex items-center gap-3">
-                <span class="w-6 h-6 rounded-full bg-slate-800 text-xs font-bold text-slate-400 flex items-center justify-center">#${idx + 1}</span>
+            <div class="flex items-center justify-between py-2 border-b border-white/[0.04] last:border-0 font-mono text-xs">
+              <div class="flex items-center gap-2.5">
+                <span class="w-5 h-5 rounded bg-zinc-900 border border-white/[0.08] text-[10px] text-zinc-400 flex items-center justify-center font-mono">0${idx + 1}</span>
                 <div>
-                  <div class="text-sm font-semibold text-slate-200">${this.escapeHtml(t.title)}</div>
-                  <div class="text-xs text-slate-400">${t.date} • ${this.escapeHtml(t.category)}</div>
+                  <div class="font-medium text-zinc-200 text-xs">${this.escapeHtml(t.title)}</div>
+                  <div class="text-[10px] text-zinc-500">${t.date} / ${this.escapeHtml(t.category)}</div>
                 </div>
               </div>
-              <div class="font-mono-num font-bold text-rose-400">-${cur}${t.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+              <div class="font-mono-num font-semibold text-rose-400">-${cur}${t.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
             </div>
           `;
         });
@@ -825,21 +856,9 @@ const App = {
   },
 
   // Helpers
-  getCategoryIcon(cat) {
-    const map = {
-      'Food & Dining': '🍔',
-      'Housing & Rent': '🏠',
-      'Transportation': '🚗',
-      'Shopping': '🛍️',
-      'Utilities': '💡',
-      'Entertainment': '🎬',
-      'Healthcare': '💊',
-      'Salary': '💵',
-      'Freelance': '💻',
-      'Investment': '📈',
-      'Other': '📦'
-    };
-    return map[cat] || '🏷️';
+  getCategoryDot(cat) {
+    const color = ChartManager.getCategoryColor(cat);
+    return `<span class="badge-cat-dot" style="background-color: ${color}"></span>`;
   },
 
   getCategoryClass(cat) {
@@ -955,15 +974,16 @@ const App = {
 
   showToast(msg, type = 'success') {
     const toast = document.createElement('div');
-    const color = type === 'error' ? 'bg-rose-600 text-white' : 'bg-indigo-600 text-white';
-    toast.className = `fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 text-sm font-semibold animate-pop-in ${color}`;
-    toast.innerHTML = `<span>${type === 'error' ? '⚠️' : '✓'}</span> <span>${this.escapeHtml(msg)}</span>`;
+    const dotColor = type === 'error' ? 'bg-rose-400' : 'bg-emerald-400';
+    toast.className = 'fixed bottom-4 right-4 z-50 px-3.5 py-2 rounded-md bg-zinc-950 border border-white/[0.12] shadow-2xl flex items-center gap-2.5 text-xs font-mono text-zinc-200 motion-spring-in';
+    toast.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${dotColor}"></span><span>${this.escapeHtml(msg)}</span>`;
     document.body.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = '0';
-      toast.style.transition = 'opacity 0.3s ease';
-      setTimeout(() => toast.remove(), 300);
-    }, 2800);
+      toast.style.transform = 'translateY(4px)';
+      toast.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+      setTimeout(() => toast.remove(), 200);
+    }, 2400);
   }
 };
 

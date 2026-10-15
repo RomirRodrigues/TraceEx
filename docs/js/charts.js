@@ -1,6 +1,6 @@
 /**
- * TraceEx Charts Module
- * Renders high-performance, responsive Chart.js visualizations.
+ * TraceEx Modern Chart.js Module
+ * 21st.dev Developer Edition
  */
 const ChartManager = {
   cashFlowChart: null,
@@ -10,20 +10,20 @@ const ChartManager = {
 
   categoryColors: {
     'Food & Dining': '#f59e0b',
-    'Housing & Rent': '#3b82f6',
-    'Transportation': '#0ea5e9',
+    'Housing & Rent': '#6366f1',
+    'Transportation': '#38bdf8',
     'Shopping': '#ec4899',
-    'Utilities': '#8b5cf6',
-    'Entertainment': '#d946ef',
-    'Healthcare': '#ef4444',
+    'Utilities': '#a855f7',
+    'Entertainment': '#e879f9',
+    'Healthcare': '#f43f5e',
     'Salary': '#10b981',
     'Freelance': '#14b8a6',
-    'Investment': '#6366f1',
-    'Other': '#94a3b8'
+    'Investment': '#818cf8',
+    'Other': '#71717a'
   },
 
   getCategoryColor(category) {
-    return this.categoryColors[category] || '#64748b';
+    return this.categoryColors[category] || '#71717a';
   },
 
   renderCashFlow(canvasId, trends, currency) {
@@ -38,19 +38,19 @@ const ChartManager = {
     const labels = trends.map(t => {
       const parts = t.month.split('-');
       const d = new Date(parts[0], parseInt(parts[1], 10) - 1, 1);
-      return d.toLocaleString('default', { month: 'short', year: '2-digit' });
+      return d.toLocaleString('default', { month: 'short' }).toUpperCase();
     });
 
     const incomeData = trends.map(t => t.income);
     const expenseData = trends.map(t => t.expense);
 
-    // Gradient fills
-    const incGradient = ctx.createLinearGradient(0, 0, 0, 300);
-    incGradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+    // Subtle modern developer gradients
+    const incGradient = ctx.createLinearGradient(0, 0, 0, 260);
+    incGradient.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
     incGradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
 
-    const expGradient = ctx.createLinearGradient(0, 0, 0, 300);
-    expGradient.addColorStop(0, 'rgba(244, 63, 94, 0.35)');
+    const expGradient = ctx.createLinearGradient(0, 0, 0, 260);
+    expGradient.addColorStop(0, 'rgba(244, 63, 94, 0.2)');
     expGradient.addColorStop(1, 'rgba(244, 63, 94, 0.0)');
 
     this.cashFlowChart = new Chart(ctx, {
@@ -59,28 +59,32 @@ const ChartManager = {
         labels: labels,
         datasets: [
           {
-            label: 'Income',
+            label: 'INFLOW',
             data: incomeData,
             borderColor: '#10b981',
             backgroundColor: incGradient,
-            borderWidth: 2.5,
+            borderWidth: 2,
             fill: true,
-            tension: 0.35,
-            pointBackgroundColor: '#10b981',
-            pointRadius: 4,
-            pointHoverRadius: 6
+            tension: 0.3,
+            pointBackgroundColor: '#09090b',
+            pointBorderColor: '#10b981',
+            pointBorderWidth: 2,
+            pointRadius: 3,
+            pointHoverRadius: 5
           },
           {
-            label: 'Expenses',
+            label: 'OUTFLOW',
             data: expenseData,
             borderColor: '#f43f5e',
             backgroundColor: expGradient,
-            borderWidth: 2.5,
+            borderWidth: 2,
             fill: true,
-            tension: 0.35,
-            pointBackgroundColor: '#f43f5e',
-            pointRadius: 4,
-            pointHoverRadius: 6
+            tension: 0.3,
+            pointBackgroundColor: '#09090b',
+            pointBorderColor: '#f43f5e',
+            pointBorderWidth: 2,
+            pointRadius: 3,
+            pointHoverRadius: 5
           }
         ]
       },
@@ -94,27 +98,44 @@ const ChartManager = {
         plugins: {
           legend: {
             position: 'top',
+            align: 'end',
             labels: {
-              boxWidth: 12,
-              font: { family: "'Plus Jakarta Sans', sans-serif", weight: '600' },
-              color: '#94a3b8'
+              boxWidth: 8,
+              boxHeight: 8,
+              usePointStyle: true,
+              pointStyle: 'circle',
+              font: { family: "'Geist Mono', monospace", size: 10, weight: '500' },
+              color: '#71717a',
+              padding: 16
             }
           },
           tooltip: {
+            backgroundColor: '#18181b',
+            borderColor: 'rgba(255, 255, 255, 0.1)',
+            borderWidth: 1,
+            titleFont: { family: "'Geist Mono', monospace", size: 11 },
+            bodyFont: { family: "'Geist Mono', monospace", size: 11 },
+            padding: 10,
+            cornerRadius: 6,
             callbacks: {
-              label: (ctx) => `${ctx.dataset.label}: ${currency}${ctx.parsed.y.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+              label: (ctx) => ` ${ctx.dataset.label}: ${currency}${ctx.parsed.y.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
             }
           }
         },
         scales: {
           x: {
             grid: { display: false },
-            ticks: { color: '#94a3b8' }
+            ticks: { 
+              font: { family: "'Geist Mono', monospace", size: 10 },
+              color: '#71717a' 
+            }
           },
           y: {
-            grid: { color: 'rgba(255, 255, 255, 0.06)' },
+            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+            border: { dash: [4, 4] },
             ticks: {
-              color: '#94a3b8',
+              font: { family: "'Geist Mono', monospace", size: 10 },
+              color: '#71717a',
               callback: (val) => `${currency}${val}`
             }
           }
@@ -136,8 +157,8 @@ const ChartManager = {
       this.categoryChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['No Expenses Recorded'],
-          datasets: [{ data: [1], backgroundColor: ['#334155'], borderWidth: 0 }]
+          labels: ['No Activity'],
+          datasets: [{ data: [1], backgroundColor: ['#27272a'], borderWidth: 0 }]
         },
         options: {
           maintainAspectRatio: false,
@@ -159,29 +180,39 @@ const ChartManager = {
           data: data,
           backgroundColor: bgColors,
           borderWidth: 2,
-          borderColor: 'rgba(15, 23, 42, 0.8)',
-          hoverOffset: 6
+          borderColor: '#09090b',
+          hoverOffset: 4
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '72%',
+        cutout: '74%',
         plugins: {
           legend: {
             position: 'right',
             labels: {
-              boxWidth: 12,
-              font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '500' },
-              color: '#94a3b8',
-              padding: 10
+              boxWidth: 8,
+              boxHeight: 8,
+              usePointStyle: true,
+              pointStyle: 'circle',
+              font: { family: "'Geist Mono', monospace", size: 10, weight: '500' },
+              color: '#a1a1aa',
+              padding: 8
             }
           },
           tooltip: {
+            backgroundColor: '#18181b',
+            borderColor: 'rgba(255, 255, 255, 0.1)',
+            borderWidth: 1,
+            titleFont: { family: "'Geist Mono', monospace", size: 11 },
+            bodyFont: { family: "'Geist Mono', monospace", size: 11 },
+            padding: 8,
+            cornerRadius: 6,
             callbacks: {
               label: (ctx) => {
                 const item = categoryBreakdown[ctx.dataIndex];
-                return `${item.category}: ${currency}${item.amount.toLocaleString()} (${item.percent}%)`;
+                return ` ${item.category}: ${currency}${item.amount.toLocaleString()} (${item.percent}%)`;
               }
             }
           }
@@ -199,10 +230,7 @@ const ChartManager = {
       this.dailyChart.destroy();
     }
 
-    const labels = Object.keys(dailyExpenses).map(dateStr => {
-      const p = dateStr.split('-');
-      return `${p[2]}`; // day number
-    });
+    const labels = Object.keys(dailyExpenses).map(dateStr => dateStr.split('-')[2]);
     const values = Object.values(dailyExpenses);
 
     this.dailyChart = new Chart(ctx, {
@@ -210,11 +238,10 @@ const ChartManager = {
       data: {
         labels: labels,
         datasets: [{
-          label: 'Daily Spend',
+          label: 'Outflow',
           data: values,
-          backgroundColor: 'rgba(99, 102, 241, 0.8)',
-          hoverBackgroundColor: '#818cf8',
-          borderRadius: 6
+          backgroundColor: '#3b82f6',
+          borderRadius: 3
         }]
       },
       options: {
@@ -223,21 +250,29 @@ const ChartManager = {
         plugins: {
           legend: { display: false },
           tooltip: {
+            backgroundColor: '#18181b',
+            borderColor: 'rgba(255, 255, 255, 0.1)',
+            borderWidth: 1,
+            titleFont: { family: "'Geist Mono', monospace", size: 11 },
+            bodyFont: { family: "'Geist Mono', monospace", size: 11 },
+            cornerRadius: 6,
             callbacks: {
               title: (items) => `Day ${items[0].label}`,
-              label: (ctx) => `Spent: ${currency}${ctx.parsed.y.toLocaleString()}`
+              label: (ctx) => ` Spent: ${currency}${ctx.parsed.y.toLocaleString()}`
             }
           }
         },
         scales: {
           x: {
             grid: { display: false },
-            ticks: { color: '#94a3b8' }
+            ticks: { font: { family: "'Geist Mono', monospace", size: 10 }, color: '#71717a' }
           },
           y: {
-            grid: { color: 'rgba(255, 255, 255, 0.06)' },
+            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+            border: { dash: [4, 4] },
             ticks: {
-              color: '#94a3b8',
+              font: { family: "'Geist Mono', monospace", size: 10 },
+              color: '#71717a',
               callback: (val) => `${currency}${val}`
             }
           }
@@ -257,17 +292,17 @@ const ChartManager = {
 
     const labels = Object.keys(paymentMethods);
     const values = Object.values(paymentMethods);
-    const colors = ['#6366f1', '#10b981', '#f59e0b', '#0ea5e9', '#ec4899', '#8b5cf6'];
+    const colors = ['#6366f1', '#10b981', '#f59e0b', '#38bdf8', '#ec4899', '#a855f7'];
 
     this.paymentChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: labels,
         datasets: [{
-          label: 'Total Spent',
+          label: 'Channel Volume',
           data: values,
           backgroundColor: colors.slice(0, labels.length),
-          borderRadius: 6
+          borderRadius: 3
         }]
       },
       options: {
@@ -277,19 +312,26 @@ const ChartManager = {
         plugins: {
           legend: { display: false },
           tooltip: {
+            backgroundColor: '#18181b',
+            borderColor: 'rgba(255, 255, 255, 0.1)',
+            borderWidth: 1,
+            titleFont: { family: "'Geist Mono', monospace", size: 11 },
+            bodyFont: { family: "'Geist Mono', monospace", size: 11 },
+            cornerRadius: 6,
             callbacks: {
-              label: (ctx) => `${ctx.label}: ${currency}${ctx.parsed.x.toLocaleString()}`
+              label: (ctx) => ` Volume: ${currency}${ctx.parsed.x.toLocaleString()}`
             }
           }
         },
         scales: {
           x: {
-            grid: { color: 'rgba(255, 255, 255, 0.06)' },
-            ticks: { color: '#94a3b8', callback: (val) => `${currency}${val}` }
+            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+            border: { dash: [4, 4] },
+            ticks: { font: { family: "'Geist Mono', monospace", size: 10 }, color: '#71717a', callback: (val) => `${currency}${val}` }
           },
           y: {
             grid: { display: false },
-            ticks: { color: '#94a3b8' }
+            ticks: { font: { family: "'Geist Mono', monospace", size: 10 }, color: '#a1a1aa' }
           }
         }
       }
