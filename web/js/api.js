@@ -727,3 +727,6 @@ const LocalDatabase = {
     document.body.removeChild(link);
   }
 };
+
+window.API = API;
+window.LocalDatabase = LocalDatabase;

@@ -344,3 +344,5 @@ const ChartManager = {
     });
   }
 };
+
+window.ChartManager = ChartManager;
