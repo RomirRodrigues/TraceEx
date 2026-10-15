@@ -48,6 +48,35 @@ const API = {
     }, 500);
   },
 
+  async parseNotificationText(text) {
+    if (await this.checkBackend()) {
+      const res = await fetch(`${this.baseUrl}/parse-sms`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      if (!res.ok) throw new Error('Could not extract transaction');
+      return await res.json();
+    }
+    return LocalDatabase.parseNotification(text);
+  },
+
+  async sendWebhookPayment(payload) {
+    if (await this.checkBackend()) {
+      const res = await fetch(`${this.baseUrl}/webhook/payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('Webhook processing failed');
+      return await res.json();
+    }
+    const tx = typeof payload === 'string' 
+      ? LocalDatabase.parseNotification(payload) 
+      : (payload.text ? LocalDatabase.parseNotification(payload.text) : payload);
+    return LocalDatabase.addTransaction(tx);
+  },
+
   async getSummary(month) {
     if (await this.checkBackend()) {
       const url = month ? `${this.baseUrl}/summary?month=${encodeURIComponent(month)}` : `${this.baseUrl}/summary`;
@@ -535,6 +564,99 @@ const LocalDatabase = {
     data.goals = [];
     this.saveData(data);
     return { success: true };
+  },
+
+  parseNotification(text) {
+    if (!text || !text.trim()) throw new Error('Empty notification text');
+
+    // 1. Detect Type
+    const isCredit = /(?:credited|received|deposited|refunded|cashback|bonus|salary)/i.test(text);
+    const type = isCredit ? 'INCOME' : 'EXPENSE';
+
+    // 2. Extract Amount
+    let amount = 0;
+    const amtRegex = /(?:(?:Rs\.?|INR|₹|\$|USD|EUR|€|GBP|£)\s*([0-9,]+(?:\.[0-9]{1,2})?))|(?:([0-9,]+(?:\.[0-9]{1,2})?)\s*(?:Rs\.?|INR|₹|USD|EUR))/i;
+    const amtMatch = text.match(amtRegex);
+    if (amtMatch) {
+      const raw = (amtMatch[1] || amtMatch[2] || '').replace(/,/g, '');
+      amount = parseFloat(raw) || 0;
+    }
+
+    // 3. Extract Merchant
+    let title = 'Mobile Payment';
+    const merRegex = /(?:(?:to|at|vpa|paid to|spent at|transferred to|towards)\s+([A-Za-z0-9&\.\-\s]{2,30}?)(?:\s+(?:on|using|via|ref|upi|avl|bal|a\/c|card)|[\.,]|$))/i;
+    const merMatch = text.match(merRegex);
+    if (merMatch && merMatch[1]) {
+      let cleaned = merMatch[1].replace(/\b(on|using|from|via|ref|for|by)\b.*$/i, '').trim();
+      cleaned = cleaned.replace(/[^a-zA-Z0-9&\s\.]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (cleaned.length >= 2) {
+        title = cleaned.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+      }
+    }
+
+    // 4. Payment Method
+    let paymentMethod = 'UPI';
+    let notes = 'Mobile Sync';
+    const lower = text.toLowerCase();
+    if (lower.includes('google pay') || lower.includes('gpay')) {
+      paymentMethod = 'UPI';
+      notes = 'Google Pay Notification';
+    } else if (lower.includes('phonepe')) {
+      paymentMethod = 'UPI';
+      notes = 'PhonePe Notification';
+    } else if (lower.includes('paytm')) {
+      paymentMethod = 'UPI';
+      notes = 'Paytm Notification';
+    } else if (lower.includes('apple pay')) {
+      paymentMethod = 'Credit Card';
+      notes = 'Apple Pay Alert';
+    } else if (lower.includes('credit card') || lower.includes('ending') || lower.includes('card')) {
+      paymentMethod = 'Credit Card';
+      notes = 'Card Notification';
+    } else if (lower.includes('debit card')) {
+      paymentMethod = 'Debit Card';
+      notes = 'Debit Card Notification';
+    } else if (lower.includes('a/c') || lower.includes('bank') || lower.includes('neft') || lower.includes('imps')) {
+      paymentMethod = 'Bank Transfer';
+      notes = 'Bank Alert Sync';
+    }
+
+    // 5. Category
+    let category = 'Other';
+    if (isCredit) {
+      if (lower.includes('salary') || lower.includes('payroll')) category = 'Salary';
+      else if (lower.includes('dividend') || lower.includes('interest')) category = 'Investment';
+      else category = 'Freelance';
+    } else {
+      const search = (title + ' ' + lower);
+      if (/(swiggy|zomato|starbucks|mcdonald|burger|cafe|coffee|restaurant|bistro|food|grocery|groceries|supermarket|whole foods|subway|pizza|dining)/i.test(search)) {
+        category = 'Food & Dining';
+      } else if (/(uber|ola|rapido|lyft|metro|irctc|railway|airline|flight|fuel|petrol|diesel|gas station|shell|toll|parking)/i.test(search)) {
+        category = 'Transportation';
+      } else if (/(amazon|flipkart|myntra|zara|h&m|retail|mart|store|mall|shopping|electronics|apple|clothing|wear|nike|adidas)/i.test(search)) {
+        category = 'Shopping';
+      } else if (/(netflix|spotify|prime|disney|hotstar|youtube|cinema|movie|theater|bookmyshow|game|steam|playstation)/i.test(search)) {
+        category = 'Entertainment';
+      } else if (/(electric|power|bescom|water|wifi|broadband|airtel|jio|vi|telecom|utility|bill|recharge)/i.test(search)) {
+        category = 'Utilities';
+      } else if (/(hospital|pharmacy|medical|clinic|doctor|apollo|1mg|pharmeasy|meds|diagnostics|healthcare)/i.test(search)) {
+        category = 'Healthcare';
+      } else if (/(rent|lease|landlord|maintenance|society|flat|apartment)/i.test(search)) {
+        category = 'Housing & Rent';
+      }
+    }
+
+    return {
+      id: 'tx-' + Date.now(),
+      title,
+      amount,
+      type,
+      category,
+      date: new Date().toISOString().slice(0, 10),
+      paymentMethod,
+      notes: notes + ' • Auto-parsed',
+      isRecurring: false
+    };
   },
 
   downloadCsv() {

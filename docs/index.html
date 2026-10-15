@@ -77,6 +77,13 @@
           <span id="theme-icon">☀️</span>
         </button>
 
+        <!-- Live Mobile Sync Button -->
+        <button onclick="App.openMobileSyncModal()" title="Connect Live Mobile Payment Apps & SMS" class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg shadow-lg shadow-emerald-500/25 transition">
+          <span class="text-sm">📱</span>
+          <span class="hidden lg:inline">Live Mobile Sync</span>
+          <span class="lg:hidden">Sync</span>
+        </button>
+
         <!-- Add Transaction Button -->
         <button id="btn-add-tx" class="flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs sm:text-sm font-semibold px-3.5 py-1.5 rounded-lg shadow-lg shadow-indigo-500/25 transition">
           <span class="text-base leading-none">+</span>
@@ -100,6 +107,9 @@
       </button>
       <button data-tab-target="budgets" class="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg text-slate-400 hover:bg-slate-800 transition whitespace-nowrap">
         <span>🎯</span> Budgets & Goals
+      </button>
+      <button data-tab-target="mobile-sync" class="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg text-emerald-400 hover:bg-slate-800 transition whitespace-nowrap border border-emerald-500/20">
+        <span>📱</span> Mobile Live Sync
       </button>
       <button data-tab-target="analytics" class="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg text-slate-400 hover:bg-slate-800 transition whitespace-nowrap">
         <span>📈</span> Analytics & Reports
@@ -383,6 +393,172 @@
         <div id="goals-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <!-- Populated by JS -->
         </div>
+      </div>
+
+    </section>
+
+    <!-- ================= TAB 3.5: MOBILE LIVE SYNC ================= -->
+    <section data-tab-content="mobile-sync" class="space-y-6 hidden">
+      
+      <!-- Top Banner / Intro -->
+      <div class="glass-card p-6 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-indigo-950/40 border-emerald-500/30">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-2xl">📱</span>
+              <h2 class="text-xl font-extrabold text-white">Live Mobile Payment & App Sync</h2>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 animate-pulse">Live Link</span>
+            </div>
+            <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+              Connect Google Pay, PhonePe, Paytm, BHIM UPI, Apple Pay, and Bank SMS directly to TraceEx. Paste or forward payment alerts, or set up instant zero-touch background automation with your mobile device!
+            </p>
+          </div>
+          <button onclick="App.copyWebhookUrl()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center gap-1.5 whitespace-nowrap">
+            <span>🔗</span> Copy Live Webhook URL
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Two-Column Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Column 1: Live SMS / Notification Auto-Reader -->
+        <div class="glass-card p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                <span>⚡</span> Smart Payment Auto-Reader
+              </h3>
+              <p class="text-xs text-slate-400">Paste any payment notification, UPI alert, or bank SMS</p>
+            </div>
+            <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Auto AI/Regex</span>
+          </div>
+
+          <!-- Quick Test Chips -->
+          <div>
+            <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Test with real-world samples:</div>
+            <div class="flex flex-wrap gap-1.5">
+              <button onclick="App.loadSampleSms('swiggy')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 transition">🍔 Swiggy UPI</button>
+              <button onclick="App.loadSampleSms('starbucks')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 transition">☕ Starbucks GPay</button>
+              <button onclick="App.loadSampleSms('shell')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 transition">⛽ Shell Card</button>
+              <button onclick="App.loadSampleSms('salary')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 transition">💵 Salary Credit</button>
+              <button onclick="App.loadSampleSms('netflix')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/80 transition">🎬 Apple Pay</button>
+            </div>
+          </div>
+
+          <!-- Text Area -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Notification / SMS Text:</label>
+            <textarea id="sms-input-text" rows="4" oninput="App.parseSmsLive()" placeholder="Paste message from Google Pay, PhonePe, Paytm, HDFC, SBI, ICICI, Apple Pay, Chase..." 
+                      class="w-full bg-slate-900/90 text-sm text-slate-100 border border-slate-700 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-xs"></textarea>
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <button onclick="document.getElementById('sms-input-text').value = ''; document.getElementById('parsed-result-card').classList.add('hidden');" class="text-xs text-slate-400 hover:text-slate-200">Clear</button>
+            <button onclick="App.parseSmsLive()" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg transition shadow">
+              ⚡ Detect & Extract
+            </button>
+          </div>
+
+          <!-- Parsed Result Live Card (hidden until parsed) -->
+          <div id="parsed-result-card" class="p-4 rounded-xl bg-slate-900/95 border border-emerald-500/40 shadow-xl space-y-3 hidden animate-pop-in">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Detected Transaction
+              </span>
+              <span id="parsed-type" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">EXPENSE</span>
+            </div>
+
+            <div class="flex items-baseline justify-between">
+              <div>
+                <div id="parsed-title" class="text-base font-bold text-white">Merchant Name</div>
+                <div id="parsed-notes" class="text-xs text-slate-400">Notes</div>
+              </div>
+              <div id="parsed-amount" class="text-xl font-bold font-mono-num text-rose-400">-$0.00</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-800/80">
+              <div>
+                <span class="text-slate-400">Category:</span>
+                <span id="parsed-category" class="font-semibold text-indigo-300 ml-1">Food & Dining</span>
+              </div>
+              <div>
+                <span class="text-slate-400">Payment:</span>
+                <span id="parsed-payment" class="font-semibold text-slate-200 ml-1 font-mono-num">UPI</span>
+              </div>
+            </div>
+
+            <button onclick="App.confirmParsedTx()" class="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-sm rounded-lg shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-1.5">
+              <span>✓</span> Add to Live Ledger
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Column 2: 100% Background Automation Guide (MacroDroid / Tasker / Shortcuts) -->
+        <div class="glass-card p-6 space-y-4 flex flex-col justify-between">
+          <div>
+            <div class="border-b border-slate-800 pb-3 mb-3">
+              <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                <span>🤖</span> Zero-Touch Real-Time Mobile Automation
+              </h3>
+              <p class="text-xs text-slate-400">How real expense apps log live data without typing</p>
+            </div>
+
+            <!-- Webhook Box -->
+            <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2 mb-4">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-semibold text-slate-300">Your Live Webhook Endpoint:</span>
+                <button onclick="App.copyWebhookUrl()" class="text-indigo-400 hover:text-indigo-300 text-xs font-semibold underline">Copy URL</button>
+              </div>
+              <code class="block text-xs font-mono text-emerald-400 bg-slate-950 p-2.5 rounded-lg border border-slate-800/80 break-all select-all">
+                http://localhost:8080/api/webhook/payment
+              </code>
+              <p class="text-[11px] text-slate-400 leading-normal">
+                Accepts HTTP POST with raw notification text or JSON payload: <code class="text-slate-300">{"text": "Paid Rs 250 to Subway..."}</code>
+              </p>
+            </div>
+
+            <!-- Steps for Android & iOS -->
+            <div class="space-y-3">
+              
+              <!-- Android Setup -->
+              <div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-xs space-y-1.5">
+                <div class="font-bold text-slate-200 flex items-center gap-1.5">
+                  <span class="text-emerald-400">🤖</span> Android (MacroDroid or Tasker - 2 Min Setup):
+                </div>
+                <ol class="list-decimal list-inside text-slate-400 space-y-1 pl-1">
+                  <li>Install free <strong class="text-slate-200">MacroDroid</strong> or <strong class="text-slate-200">Tasker</strong> from Google Play Store.</li>
+                  <li>Set <strong class="text-indigo-400">Trigger</strong>: <em>Notification Received</em> &rarr; Select <strong class="text-slate-200">Google Pay, PhonePe, Paytm</strong> or SMS app.</li>
+                  <li>Set <strong class="text-emerald-400">Action</strong>: <em>HTTP Request</em> (Method: POST, URL: your webhook, Body: <code class="text-slate-300">{"text": "[not_text]"}</code>).</li>
+                </ol>
+                <div class="text-[11px] text-emerald-400/90 pt-1">
+                  &bull; <em>Result:</em> Every single time you pay at a store or tap UPI, it logs into TraceEx within 500ms!
+                </div>
+              </div>
+
+              <!-- iOS Setup -->
+              <div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-xs space-y-1.5">
+                <div class="font-bold text-slate-200 flex items-center gap-1.5">
+                  <span class="text-indigo-400">🍏</span> iOS (Apple Shortcuts Automation):
+                </div>
+                <ol class="list-decimal list-inside text-slate-400 space-y-1 pl-1">
+                  <li>Open the built-in <strong class="text-slate-200">Shortcuts</strong> app on your iPhone &rarr; tap <strong>Automation</strong>.</li>
+                  <li>Choose <em>"When I receive a message from Bank"</em> or <em>"Transaction"</em>.</li>
+                  <li>Add Action: <strong class="text-slate-200">Get Contents of URL</strong> (POST to your TraceEx Webhook).</li>
+                </ol>
+              </div>
+
+              <!-- Open Banking Note -->
+              <div class="p-3 rounded-lg bg-slate-900/40 border border-slate-800/60 text-[11px] text-slate-400">
+                <strong class="text-slate-300">🏦 Production Open Banking / Account Aggregators:</strong><br>
+                For direct bank-to-bank API sync without notifications, enterprise apps use regulated Account Aggregators (like <strong class="text-slate-200">RBI-licensed Setu / Finvu</strong> in India or <strong class="text-slate-200">Plaid / Salt Edge</strong> in US/Europe) via approved developer credentials.
+              </div>
+
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </section>
@@ -752,7 +928,47 @@
 
       <div class="pt-4 border-t border-dashed border-slate-300 flex items-center gap-2">
         <button onclick="window.print()" class="flex-1 py-2 rounded-lg bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-700 transition">Print Receipt</button>
-        <button onclick="App.closeReceiptModal()" class="py-2 px-4 rounded-lg bg-slate-100 text-slate-700 font-semibold text-xs hover:bg-slate-200 transition">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Mobile Live Sync Quick Modal -->
+  <div id="mobile-sync-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
+    <div class="glass-card bg-slate-900 border-slate-700 max-w-lg w-full p-6 animate-pop-in space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📱</span>
+          <h3 class="text-base font-bold text-white">Live Mobile Payment & SMS Parser</h3>
+        </div>
+        <button onclick="App.closeMobileSyncModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <div>
+        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Quick Test Real Alerts:</div>
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="App.loadSampleSms('swiggy')" class="px-2 py-0.5 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">🍔 Swiggy</button>
+          <button onclick="App.loadSampleSms('starbucks')" class="px-2 py-0.5 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">☕ Starbucks</button>
+          <button onclick="App.loadSampleSms('shell')" class="px-2 py-0.5 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">⛽ Shell</button>
+          <button onclick="App.loadSampleSms('salary')" class="px-2 py-0.5 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">💵 Salary</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Paste SMS / Notification from GPay, PhonePe, Paytm, Bank:</label>
+        <textarea id="sms-modal-input" rows="3" placeholder="e.g. Paid Rs 350 to Starbucks on UPI..." 
+                  class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-xs"></textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+        <a href="javascript:void(0)" onclick="App.closeMobileSyncModal(); App.switchTab('mobile-sync');" class="text-xs text-indigo-400 hover:underline">
+          View Full Mobile Automation Setup →
+        </a>
+        <div class="flex gap-2">
+          <button onclick="App.closeMobileSyncModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 transition">Close</button>
+          <button onclick="const val = document.getElementById('sms-modal-input').value; App.closeMobileSyncModal(); App.switchTab('mobile-sync'); document.getElementById('sms-input-text').value = val; App.parseSmsLive();" class="px-4 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-500 transition">
+            ⚡ Parse & Add
+          </button>
+        </div>
       </div>
     </div>
   </div>

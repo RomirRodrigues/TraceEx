@@ -7,6 +7,7 @@ import com.traceex.model.Goal;
 import com.traceex.model.Transaction;
 import com.traceex.repository.DataStore;
 import com.traceex.service.ExpenseService;
+import com.traceex.util.NotificationParser;
 
 import java.io.*;
 import java.net.URI;
@@ -42,6 +43,10 @@ public class ApiHandler implements HttpHandler {
                 handleBudgets(exchange, method, path);
             } else if (path.startsWith("/api/goals")) {
                 handleGoals(exchange, method, path);
+            } else if (path.equals("/api/webhook/payment")) {
+                handlePaymentWebhook(exchange, method);
+            } else if (path.equals("/api/parse-sms")) {
+                handleParseSms(exchange, method);
             } else if (path.equals("/api/summary")) {
                 handleSummary(exchange, method, queryParams);
             } else if (path.equals("/api/settings")) {
@@ -267,6 +272,56 @@ public class ApiHandler implements HttpHandler {
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
         }
+    }
+
+    private void handlePaymentWebhook(HttpExchange exchange, String method) throws IOException {
+        if (!"POST".equalsIgnoreCase(method)) {
+            sendJsonResponse(exchange, 405, Map.of("error", "Method not allowed. Use POST"));
+            return;
+        }
+
+        String body = readRequestBody(exchange);
+        Map<String, Object> map = JsonUtils.parseObject(body);
+
+        Transaction tx;
+        String rawText = JsonUtils.getString(map, "text", null);
+        if (rawText != null && !rawText.trim().isEmpty()) {
+            tx = NotificationParser.parseNotification(rawText);
+        } else {
+            tx = Transaction.fromMap(map);
+        }
+
+        if (tx == null || tx.getAmount() <= 0) {
+            sendJsonResponse(exchange, 400, Map.of("error", "Could not parse a valid transaction from the request"));
+            return;
+        }
+
+        dataStore.addTransaction(tx);
+        System.out.println("[TraceEx Live Webhook] Auto-recorded payment: " + tx.getTitle() + " (" + tx.getAmount() + ")");
+        sendJsonResponse(exchange, 201, Map.of(
+                "status", "SUCCESS",
+                "message", "Payment auto-recorded to TraceEx",
+                "transaction", tx.toMap()
+        ));
+    }
+
+    private void handleParseSms(HttpExchange exchange, String method) throws IOException {
+        if (!"POST".equalsIgnoreCase(method)) {
+            sendJsonResponse(exchange, 405, Map.of("error", "Method not allowed. Use POST"));
+            return;
+        }
+
+        String body = readRequestBody(exchange);
+        Map<String, Object> map = JsonUtils.parseObject(body);
+        String rawText = JsonUtils.getString(map, "text", "");
+
+        Transaction parsed = NotificationParser.parseNotification(rawText);
+        if (parsed == null || parsed.getAmount() <= 0) {
+            sendJsonResponse(exchange, 400, Map.of("error", "Could not detect transaction amount or details from this text"));
+            return;
+        }
+
+        sendJsonResponse(exchange, 200, parsed.toMap());
     }
 
     private String readRequestBody(HttpExchange exchange) throws IOException {

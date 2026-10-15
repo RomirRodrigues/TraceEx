@@ -863,6 +863,96 @@ const App = {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   },
 
+  // ================= MOBILE PAYMENT SYNC & LIVE SMS PARSER =================
+
+  openMobileSyncModal() {
+    const modal = document.getElementById('mobile-sync-modal');
+    if (modal) modal.classList.remove('hidden');
+    const input = document.getElementById('sms-input-text');
+    if (input) input.focus();
+  },
+
+  closeMobileSyncModal() {
+    const modal = document.getElementById('mobile-sync-modal');
+    if (modal) modal.classList.add('hidden');
+  },
+
+  loadSampleSms(type) {
+    const samples = {
+      swiggy: "Dear Customer, your A/c ending in 4210 is debited by Rs 340.00 on 15-Oct-26 to VPA swiggy@icici via UPI (Ref 4291847192).",
+      starbucks: "Paid Rs. 280.00 to Starbucks Coffee using Google Pay. UPI Ref: 9812401827. Bal: Rs 14,230.",
+      shell: "Chase: Card ending 7712 charged $45.20 at Shell Oil Gas on Oct 15 at 08:32 PM.",
+      salary: "Your A/c 9021 is CREDITED with INR 65,000.00 on 01-Oct-26 by Tech Global Services Payroll.",
+      netflix: "Apple Pay: $22.99 spent at Netflix Subscription on your Master Card."
+    };
+
+    const text = samples[type] || samples.swiggy;
+    const input = document.getElementById('sms-input-text');
+    if (input) {
+      input.value = text;
+      this.parseSmsLive();
+    }
+  },
+
+  async parseSmsLive() {
+    const input = document.getElementById('sms-input-text');
+    const resultCard = document.getElementById('parsed-result-card');
+    if (!input || !resultCard) return;
+
+    const text = input.value.trim();
+    if (!text) {
+      resultCard.classList.add('hidden');
+      return;
+    }
+
+    try {
+      const parsed = await API.parseNotificationText(text);
+      this.state.parsedTx = parsed;
+
+      resultCard.classList.remove('hidden');
+      const isIncome = parsed.type === 'INCOME';
+      const sign = isIncome ? '+' : '-';
+      const color = isIncome ? 'text-emerald-400' : 'text-rose-400';
+
+      document.getElementById('parsed-title').textContent = parsed.title;
+      document.getElementById('parsed-amount').textContent = `${sign}${this.state.currency}${parsed.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+      document.getElementById('parsed-amount').className = `text-xl font-bold font-mono-num ${color}`;
+      document.getElementById('parsed-category').textContent = `${this.getCategoryIcon(parsed.category)} ${parsed.category}`;
+      document.getElementById('parsed-payment').textContent = parsed.paymentMethod;
+      document.getElementById('parsed-type').textContent = parsed.type;
+      document.getElementById('parsed-notes').textContent = parsed.notes;
+
+    } catch (err) {
+      resultCard.classList.add('hidden');
+      this.showToast('Could not detect amount or merchant from text', 'error');
+    }
+  },
+
+  async confirmParsedTx() {
+    if (!this.state.parsedTx) return;
+    try {
+      await API.addTransaction(this.state.parsedTx);
+      this.showToast(`Auto-recorded: ${this.state.parsedTx.title} (${this.state.currency}${this.state.parsedTx.amount})!`);
+      const input = document.getElementById('sms-input-text');
+      if (input) input.value = '';
+      const resultCard = document.getElementById('parsed-result-card');
+      if (resultCard) resultCard.classList.add('hidden');
+      this.state.parsedTx = null;
+      await this.refreshData();
+    } catch (err) {
+      this.showToast('Failed to add transaction: ' + err.message, 'error');
+    }
+  },
+
+  copyWebhookUrl() {
+    const url = window.location.origin + '/api/webhook/payment';
+    navigator.clipboard.writeText(url).then(() => {
+      this.showToast('Webhook URL copied to clipboard: ' + url);
+    }).catch(() => {
+      prompt('Copy your Live Webhook URL:', url);
+    });
+  },
+
   showToast(msg, type = 'success') {
     const toast = document.createElement('div');
     const color = type === 'error' ? 'bg-rose-600 text-white' : 'bg-indigo-600 text-white';
