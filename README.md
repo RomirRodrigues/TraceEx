@@ -1,5 +1,6 @@
 # TraceEx — The Ultimate Expense Tracker
 
+> **Live Website**: **[https://romirrodrigues.github.io/TraceEx/](https://romirrodrigues.github.io/TraceEx/)**  
 > **TraceEx** is a modern, full-featured financial management web application powered by a lightweight, zero-external-dependency **pure Java backend** (`jdk.httpserver`). It provides a sleek fintech dashboard, interactive analytics, monthly category budgeting, savings goal tracking, digital receipts, and multi-currency support.
 
 ---
