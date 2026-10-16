@@ -15,4 +15,7 @@ sources.txt
 # PDF Reports & Documentation drafts (local only)
 *.pdf
 report/
+report_assets/
+build_pdf_report.py
+create_report_assets.py
 *.report.*
