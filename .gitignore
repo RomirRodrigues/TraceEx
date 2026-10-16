@@ -11,3 +11,8 @@ sources.txt
 .idea/
 .vscode/
 *.iml
+
+# PDF Reports & Documentation drafts (local only)
+*.pdf
+report/
+*.report.*
